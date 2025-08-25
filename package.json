@@ -1,0 +1,41 @@
+{
+  "name": "mindoro",
+  "version": "0.0.0",
+  "description": "I'm tired of mind maps",
+  "main": "script.js",
+  "type": "module",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamidb80/mindoro.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hamidb80/mindoro/issues"
+  },
+  "homepage": "https://github.com/hamidb80/mindoro#readme",
+  "dependencies": {
+    "array-shuffle": "^3.0.0",
+    "edge.js": "^6.3.0",
+    "express": "^5.1.0",
+    "fast-glob": "^3.3.3",
+    "gemoji": "^8.1.0",
+    "js-yaml": "^4.1.0",
+    "mdast-util-find-and-replace": "^3.0.2",
+    "mdast-util-to-hast": "^13.2.0",
+    "remark": "^15.0.1",
+    "remark-gemoji": "^8.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-html": "^16.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "remark-wikilinks": "^1.1.0",
+    "suffixer": "^1.0.4",
+    "to-vfile": "^8.0.0",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.0.0",
+    "unist-util-visit-parents": "^6.0.1",
+    "yaml": "^2.8.1"
+  }
+}

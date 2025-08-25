@@ -1,0 +1,8 @@
+node_modules/
+.prettier/
+
+**/build/
+**/dist/
+
+.env
+play.*

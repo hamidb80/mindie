@@ -1,0 +1,34 @@
+@component('blueprint', {})
+<div id="grid-container"></div>
+<div class="counter">Rectangles:
+  <span id="count">0</span>/30</div>
+<div class="center-indicator" id="center-indicator"></div>
+<!-- Controls Panel -->
+<div id="controls">
+  <h3>Settings</h3>
+  <div class="control-group">
+    <label for="delay-slider">
+      Appearance Delay:
+      <span id="delay-value">250</span>ms
+    </label>
+    <input
+      type="range"
+      id="delay-slider"
+      min="50"
+      max="1000"
+      value="250"
+      step="50"
+    >
+  </div>
+</div>
+<!-- Popup Elements -->
+<div id="overlay"></div>
+<div id="popup">
+  <button id="popup-close">&times;</button>
+  <div id="popup-content">
+    <h2>Rectangle Details</h2>
+    <p id="popup-text">This is a rectangle with details.</p>
+    <p id="popup-dimensions">Size: 1x1</p>
+  </div>
+</div>
+@end

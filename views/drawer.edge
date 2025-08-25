@@ -1,0 +1,75 @@
+@component('blueprint', {title})
+<nav class="navbar px-4">
+  <a class="navbar-brand" href="#">
+    {{APP_NAME}}
+  </a>
+</nav>
+<div class="d-flex justify-content-center w-100 mt-5">
+  <div class="input-group mb-3" style="max-width: 400px">
+    <input type="text" class="form-control" placeholder="...">
+    <button class="btn btn-primary" type="button">
+      <i class="bi bi-search"></i>
+      <span class="ms-1">
+        search
+      </span>
+    </button>
+  </div>
+</div>
+<div class="d-flex justify-content-center mt-3">
+  <ul class="pagination mb-0">
+    <li class="page-item" style="">
+      <a class="page-link" href="#">
+        <i class="bi bi-map"></i>
+        <span class="ms-2">
+          map
+        </span>
+      </a>
+    </li>
+    <li class="page-item active" style="">
+      <a class="page-link" href="#">
+        <i class="bi bi-columns-gap"></i>
+        <span class="ms-2">
+          drawer
+        </span>
+      </a>
+    </li>
+  </ul>
+</div>
+<div class="d-flex justify-content-center mt-3">
+  <ul class="pagination">
+    @each(num in [1,2,3,4,5])
+    <li class="page-item" style="">
+      <a class="page-link" href="#">
+        <span class="mx-1">
+          {{num}}
+        </span>
+      </a>
+    </li>
+    @end
+  </ul>
+</div>
+<div class="d-flex justify-content-center mt-2">
+  <section class="section-drawer">
+    <div class="card-wrapper">
+      @each(snote in sliceNotes)
+      <div class="box">
+        <div class="card border-secondary-subtle mb-3">
+          <div class="card-header d-none">Header</div>
+          <div class="card-body">
+            <!-- <p class="card-text"></p> -->
+            {{{snote.html}}}
+          </div>
+          <div class="card-footer text-muted">
+            <a href="{{snote.url}}">
+              {{snote.title}}
+            </a>
+          </div>
+        </div>
+      </div>
+      @end
+    </div>
+  </section>
+  <section class="section-map">
+  </section>
+</div>
+@end
