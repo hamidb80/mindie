@@ -1,0 +1,51 @@
+a[up-follow] {
+  text-decoration: none;
+}
+
+a[up-follow]:hover {
+  text-decoration: underline;
+}
+
+* {
+  font-family: "Noto Sans Arabic", sans-serif !important;
+  font-optical-sizing: auto;
+  font-weight: 400;
+}
+
+figure img {
+  max-width: 100%;
+  object-fit: contain;
+}
+
+pre {
+  line-height: 0.9;
+  overflow-y: clip;
+}
+
+.opacity-12 {
+  opacity: 0.12;
+}
+
+
+/* ------------------------------ */
+
+@media (min-width: 992px) {
+  .content-bar {
+    overflow-y: scroll;
+    height: calc(100vh - 40px);
+  }
+}
+
+@media (max-width: 992px) {
+  .got-action-center {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    margin: 0px !important;
+    padding-bottom: 6px;
+    padding-top: 4px;
+    z-index: 4;
+    background-color: #fff;
+  }
+}
