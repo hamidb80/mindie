@@ -406,6 +406,7 @@ export function digestWorkspace(stree, wdir) {
 }
 
 /**
+ * @summary convert markdown file to HTML
  * @param {object} mdast
  * @returns {string} HTML string
  */
