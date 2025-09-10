@@ -1,21 +1,12 @@
-import * as path from "path"
-
 import { remark } from "remark"
-import * as htmlUtils from "hast-util-to-html"
-import * as hastUtils from "mdast-util-to-hast"
 import gfm from "remark-gfm"
 
-import { pop, rev } from "../utils/array.js"
 import { mdastAssetNode, mdastLinkNode, mdastTextNode } from "../utils/mdast.js"
-import { readFileSync } from "../utils/io.js"
 import { parseYamlAsJson } from "../utils/conventions.js"
 import { FileTree } from "./utils/filetree.js"
-import { COMMON_FILE_EXTS } from "../common.js"
+import { pop, rev } from "../utils/array.js"
 
 // ------------------------------------------------------
-
-const NOT_EXISTS = -1
-// -----------------------------------
 
 /**
  * utility for traversing the tree
@@ -24,7 +15,7 @@ const NOT_EXISTS = -1
  * @param {Function} fn - the map function to generate new nodes if the `cond` satisfied
  * @returns the original `node` param
  */
-function transformTree(node, cond, fn) {
+export function transformTree(node, cond, fn) {
     if (node.children) {
         const acc = []
         const stack = rev([...node.children])
@@ -51,7 +42,7 @@ function transformTree(node, cond, fn) {
  * @param {Function} cond - the condition function to be satistied
  * @returns the answer (if exists)
  */
-function visitTree(branch, cond) {
+export function visitTree(branch, cond) {
     let shouldContinue = true
 
     function visitTreeImpl(node) {
@@ -68,85 +59,7 @@ function visitTree(branch, cond) {
     visitTreeImpl(branch)
 }
 
-/**
- * content to text for simpler processing?
- * @param {object} node
- * @returns {string}
- */
-export function toTextRepr(node) {
-    if (node.type == "root") {
-        return node.children.map(toTextRepr).join("\n\n")
-    } else if (node.type == "text") {
-        return node.value
-    } else if (node.type == "paragraph") {
-        return node.children.map(toTextRepr).join("").replace(/\s+/gm, " ") // remove waste spaces
-    } else if (node.type == "strong") {
-        return node.children.map(toTextRepr).join("")
-    } else if (node.type == "emphasis") {
-        return node.children.map(toTextRepr).join("")
-    } else if (node.type == "link") {
-        return node.children.map(toTextRepr).join("")
-    } else {
-        throw new Error("unpredicted node: " + node.type)
-    }
-}
-
-/**
- * @param {string} paragraph - the text you wanna match against as text, not the AST
- * @param {Object} qbody - the body of the query
- */
-export function textMatchQuery(paragraph, query) {
-    if (query.header == "text") {
-        if (query.variant == "phrase") {
-            return paragraph.includes(query.body)
-        } else if (query.variant == "range") {
-            const head_index = paragraph.indexOf(query.head)
-            const tail_index = paragraph.lastIndexOf(query.tail)
-            return head_index != NOT_EXISTS && head_index < tail_index
-        } else {
-            throw new Error("invalid variant of text query: " + query.variant)
-        }
-    } else {
-        throw new Error(
-            "cannot match agains paragraph with query of header: " + q.header,
-        )
-    }
-}
-
-/**
- * to query a single note and find the corresponding elements
- * @param {Object} ast - AST of the note
- * @param {Object} query - parsed query
- * @returns {object | undefined)
- */
-export function queryNote(ast, query) {
-    let result
-
-    if (query.header == "text") {
-        visitTree(ast, (n) => {
-            if (n.type === "paragraph") {
-                const ptext = toTextRepr(n)
-                if (textMatchQuery(ptext, query)) {
-                    result = n
-                    return false
-                } else return true
-            } else return true
-        })
-    } else if (query.header == "asset") {
-        visitTree(ast, (n) => {
-            if (n.type === "image") {
-                if (n.url.includes(query.path)) {
-                    result = n
-                    return false
-                } else return true
-            } else return true
-        })
-    } else {
-        throw new Error("invalid header: " + query.header)
-    }
-
-    return result
-}
+// -------------------------------------------------------
 
 /**
  * consider this front matter:
@@ -195,25 +108,6 @@ export function parseQuery(h) {
 }
 
 // -------------------------------------------------------------
-
-/**
- *  reverses the reference table
- *  @param {Object} links - string -> set[string]
- *  @returns {Object} - string -> set[string]
- */
-function revRefTable(links) {
-    const tab = {}
-
-    for (const head in links) {
-        for (const tail of links[head]) {
-            if (!(tail in tab)) {
-                tab[tail] = new Set()
-            }
-            tab[tail].add(head)
-        }
-    }
-    return tab
-}
 
 /**
  * traverses the AST and mines the wiki-links out of simple texts
@@ -307,57 +201,4 @@ export function parseMarkdown(txt, path, urlify = (i) => i) {
             ast: parseFinal(txt),
             path,
         }
-}
-
-/**
- * gathers general data/metadata from workspace to feed into subsequent operations
- * @param {FileTree} ftree
- * @returns {Object}
- */
-export async function digestWorkspace(ftree, wdir) {
-    const forwards = {}
-    const queries = {}
-
-    for (const fpath of ftree.findFiles(".md")) {
-        const content = await fs.readFile(path.join(wdir, fpath), "utf-8")
-        const md = parseMarkdown(content, fpath)
-
-        // local links
-        store[md.path] = extractLocalLinks(ftree, md)
-
-        // extract queries
-        const queries = md.frontMatter?.highlights?.map(parseQuery) ?? []
-
-        for (const query of queries) {
-            let match = queryNote(md.ast, query)
-            if (match === undefined) {
-                // console.dir(md.ast, { depth: null })
-                throw new Error(
-                    `cannot match query ${JSON.stringify(query)} with any of the nodes in ${md.path}`,
-                )
-            }
-        }
-
-        store[md.path] = queries
-    }
-
-    return {
-        links: {
-            forwards,
-            backwards: revRefTable(forwards),
-        },
-        queries,
-    }
-}
-
-/**
- * @summary convert markdown file to HTML
- * @param {object} mdast
- * @returns {string} HTML string
- */
-export function md2HtmlRaw(mdast) {
-    const hast = hastUtils.toHast(mdast)
-    const html = htmlUtils.toHtml(hast)
-    console.dir(hast, { depth: null })
-    return html
 }

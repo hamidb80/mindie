@@ -1,6 +1,8 @@
 import { Suffixer } from "suffixer"
 import fg from "fast-glob"
 
+import { COMMON_FILE_EXTS } from "../common.js"
+
 // --------------------------------------------------
 
 function firstItem(t) {

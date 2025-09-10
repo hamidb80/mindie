@@ -5,12 +5,12 @@ import { Edge } from "edge.js"
 
 import {
     digestWorkspace,
-    getWorkspaceFileTree,
     md2HtmlRaw,
     parseMarkdown,
     parseQuery,
     queryNote,
 } from "../core.js"
+import { FileTree } from "../utils/filetree.js"
 
 // ----------------------------------------------
 
@@ -42,19 +42,15 @@ function resolveNote(stree, nameQuery) {
             res.sendFile(fpath)
         }
     } else {
-        console.log(result)
-        res.send("more than 1 option")
+        // more than 1
     }
 }
 /*
  * @param {String} wdir
  */
 function buildStaticWebWiki(wdir, outdir, urlPrefix) {
-    const stree = getWorkspaceFileTree(wdir)
+    const ftree = FileTree(wdir)
     const wctx = digestWorkspace(stree, wdir)
-}
-
-router.get("/", async (req, res) => {
     const sliceNotes = arrayShuffle(
         stree
             .endsWith(".md")
@@ -78,6 +74,4 @@ router.get("/", async (req, res) => {
             .flat(),
     )
     res.tmpl("drawer", { title: "Home", sliceNotes })
-})
-
-// -----------------------------------------------------------
+}
