@@ -17,7 +17,16 @@ import { FileTree } from "../utils/filetree.js"
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+const edge = Edge.create()
+edge.mount(new URL("../../views", import.meta.url))
+
 // ----------------------------------------------
+
+function render(viewname, data) {
+    edge.render(viewname, data)
+        .then((page) => res.send(page))
+        .catch(console.err)
+}
 
 function resolveNote(stree, nameQuery) {
     const result = stree.endsWith("/" + shortenPath)
