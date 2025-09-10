@@ -4,59 +4,18 @@ import { remark } from "remark"
 import * as htmlUtils from "hast-util-to-html"
 import * as hastUtils from "mdast-util-to-hast"
 import gfm from "remark-gfm"
-import fg from "fast-glob"
-import { Suffixer } from "suffixer"
 
 import { pop, rev } from "../utils/array.js"
 import { mdastAssetNode, mdastLinkNode, mdastTextNode } from "../utils/mdast.js"
 import { readFileSync } from "../utils/io.js"
 import { parseYamlAsJson } from "../utils/conventions.js"
+import { FileTree } from "./utils/filetree.js"
 import { COMMON_FILE_EXTS } from "../common.js"
 
 // ------------------------------------------------------
 
 const NOT_EXISTS = -1
-
-const core = remark().use(gfm)
-
-// ------------------------------------------------------
-
-/**
- * converts markdown file into AST (mdast)
- * @param {string} txt
- * @returns {Object} mdast
- */
-export function parseMarkdownRaw(txt) {
-    return core.parse(txt)
-}
-
-/**
- * parses a markdown file
- * @param {string} txt
- * @param {string} path
- * @returns {Object} containing the AST and the "Front Matter"
- */
-export function parseMarkdown(txt, path, urlify = (i) => i) {
-    function parseFinal(str) {
-        return mineWikiLinks(parseMarkdownRaw(str), urlify)
-    }
-    if (txt.startsWith("---")) {
-        const m = txt.match(/\n---\n/m)
-        if (m) {
-            const ytxt = txt.substring(3, m.index)
-            const mdtxt = txt.substring(m.index + m[0].length)
-            return {
-                frontMatter: parseYamlAsJson(ytxt),
-                ast: parseFinal(mdtxt),
-                path,
-            }
-        } else throw new Error("cannot find end of front matter")
-    } else
-        return {
-            ast: parseFinal(txt),
-            path,
-        }
-}
+// -----------------------------------
 
 /**
  * utility for traversing the tree
@@ -235,17 +194,7 @@ export function parseQuery(h) {
     }
 }
 
-/**
- * @param {string} wdir - workspace directory (i.e. a directory in which there are your notes)
- * @returns {Suffixer} suffix tree
- */
-export function getWorkspaceFileTree(wdir, fileFormats = COMMON_FILE_EXTS) {
-    const formats = fileFormats.join(",")
-    const filePaths = fg
-        .globSync(`${wdir}**/*{${formats}}`)
-        .map((p) => "./" + path.relative(wdir, p))
-    return new Suffixer(filePaths)
-}
+// -------------------------------------------------------------
 
 /**
  *  reverses the reference table
@@ -263,12 +212,8 @@ function revRefTable(links) {
             tab[tail].add(head)
         }
     }
-
     return tab
 }
-
-// for (const result of wtree.includes(".md")) {
-// return { forwards, backwards: revRefTable(forwards) }
 
 /**
  * traverses the AST and mines the wiki-links out of simple texts
@@ -301,15 +246,15 @@ function mineWikiLinks(mdast, urlify) {
 }
 
 /**
- * @param {Suffixer} wtree
+ * @param {FileTree} ftree
  * @param {object} md
  */
-export function extractLocalLinks(wtree, md) {
+export function extractLocalLinks(ftree, md) {
     let forwards = new Set()
 
     visitTree(md.ast, (node) => {
         if (node.type == "link" && !node.url?.includes("://")) {
-            const references = wtree
+            const references = ftree
                 .endsWith(node.url + ".md")
                 .map((it) => it[0])
 
@@ -323,24 +268,64 @@ export function extractLocalLinks(wtree, md) {
     return forwards
 }
 
+// ------------------------------------------
+
+const core = remark().use(gfm)
+
 /**
- * finds all the forward/backward links between notes
- * @param {Suffixer} wtree - workspace Suffix Tree
- * @returns {Object} {forwrad: [note-path] -> [...forward_refs], backward: ...}
+ * converts markdown file into AST (mdast)
+ * @param {string} txt
+ * @returns {Object} mdast
  */
-function extractLocalLinksPassGen(wtree, store) {
-    return (md) => {
-        store[md.path] = extractLocalLinks(wtree, md)
-    }
+export function parseMarkdownRaw(txt) {
+    return core.parse(txt)
 }
 
 /**
- * finds all the queries from "Front Matter" of the note
- * @param {Suffixer} wtree - workspace Suffix Tree
+ * parses a markdown file
+ * @param {string} txt
+ * @param {string} path
+ * @returns {Object} containing the AST and the "Front Matter"
+ */
+export function parseMarkdown(txt, path, urlify = (i) => i) {
+    function parseFinal(str) {
+        return mineWikiLinks(parseMarkdownRaw(str), urlify)
+    }
+    if (txt.startsWith("---")) {
+        const m = txt.match(/\n---\n/m)
+        if (m) {
+            const ytxt = txt.substring(3, m.index)
+            const mdtxt = txt.substring(m.index + m[0].length)
+            return {
+                frontMatter: parseYamlAsJson(ytxt),
+                ast: parseFinal(mdtxt),
+                path,
+            }
+        } else throw new Error("cannot find end of front matter")
+    } else
+        return {
+            ast: parseFinal(txt),
+            path,
+        }
+}
+
+/**
+ * gathers general data/metadata from workspace to feed into subsequent operations
+ * @param {FileTree} ftree
  * @returns {Object}
  */
-function extractQueriesPassGen(store) {
-    return function (md) {
+export async function digestWorkspace(ftree, wdir) {
+    const forwards = {}
+    const queries = {}
+
+    for (const fpath of ftree.findFiles(".md")) {
+        const content = await fs.readFile(path.join(wdir, fpath), "utf-8")
+        const md = parseMarkdown(content, fpath)
+
+        // local links
+        store[md.path] = extractLocalLinks(ftree, md)
+
+        // extract queries
         const queries = md.frontMatter?.highlights?.map(parseQuery) ?? []
 
         for (const query of queries) {
@@ -355,46 +340,6 @@ function extractQueriesPassGen(store) {
 
         store[md.path] = queries
     }
-}
-
-/**
- * @param {Array} passes
- * @returns {Function} a function that runs passes
- */
-function runPassesGen(passes) {
-    return (md) => passes.forEach((p) => p(md))
-}
-
-/**
- * iterate over .md files in the works space
- * @param {Suffixer} stree
- */
-function eachArticle(stree, wdir, fn) {
-    for (const result of stree.endsWith(".md")) {
-        const [fpath, _] = result
-        const content = readFileSync(path.join(wdir, fpath))
-        const md = parseMarkdown(content, fpath)
-        fn(md)
-    }
-}
-
-/**
- * gathers general data/metadata from workspace to feed into subsequent operations
- * @param {Suffixer} stree
- * @returns {Object}
- */
-export function digestWorkspace(stree, wdir) {
-    const forwards = {}
-    const queries = {}
-
-    eachArticle(
-        stree,
-        wdir,
-        runPassesGen([
-            extractLocalLinksPassGen(stree, forwards),
-            extractQueriesPassGen(queries),
-        ]),
-    )
 
     return {
         links: {
