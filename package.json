@@ -24,6 +24,7 @@
     "js-yaml": "^4.1.0",
     "mdast-util-find-and-replace": "^3.0.2",
     "mdast-util-to-hast": "^13.2.0",
+    "package-directory": "^8.1.0",
     "remark": "^15.0.1",
     "remark-gemoji": "^8.0.0",
     "remark-gfm": "^4.0.1",

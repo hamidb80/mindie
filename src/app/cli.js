@@ -1,6 +1,7 @@
 import * as path from "path"
 import { fileURLToPath } from "url"
 
+import { packageDirectory } from "package-directory"
 import { Edge } from "edge.js"
 
 import {
@@ -14,11 +15,10 @@ import { FileTree } from "../utils/filetree.js"
 
 // ----------------------------------------------
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const projectdir = await packageDirectory()
 
 const edge = Edge.create()
-edge.mount(new URL("../../views", import.meta.url))
+edge.mount(projectdir)
 
 // ----------------------------------------------
 
