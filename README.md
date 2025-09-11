@@ -1,6 +1,3 @@
-# Chaos
-like god gifted mind
-
 ## Why
 I'm tired of mind maps 
 

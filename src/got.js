@@ -139,6 +139,36 @@ function extractEdges(events) {
     return acc
 }
 
+function nodeClassName(id) {
+    return `node-${id}`
+}
+
+function positionedItem(node, row, col, rowRange, rowWidth) {
+    return { node, row, col, rowRange, rowWidth }
+}
+
+function toSVGImpl() {
+    // (defn- GoT/to-svg-impl (got) # extracts nessesary information for plotting
+    //   (let-acc @[]
+    //     (eachp [l nodes] (got :grid)
+    //       (eachp [i n] nodes
+    //         (let [idx (not-nil-indexes nodes)]
+    //           (if n (array/push acc (positioned-item n l i (keep-ends idx) (range-len idx)))))))))
+}
+
+function svgCalcPos() {
+    // (defn- GoT/svg-calc-pos (item got cfg ctx)
+    //     [(+ (cfg :padx) (* (cfg :spacex)    (got :canvas-width)  (* (/ 1 (+ 1 (item :row-width))) (+ 1 (- (item :col) (first (item :row-range))))) ) (* -1 (ctx :cutx)))
+    //      (+ (cfg :pady) (* (cfg :spacey) (- (got :canvas-height) (item :row) 1)))])
+}
+
+function chopInto(len, slices, max) {
+    // (defn- chop-into (len slices max)
+    //   (let [m (- max slices -1)
+    //         a (flatten [m (dup [1 m] (- slices 1))])]
+    //     (v* (/ len (sum a)) a)))
+}
+
 export class GraphOfThought {
     constructor(events) {
         this.events = events
@@ -155,105 +185,103 @@ export class GraphOfThought {
         this.edges = extractEdges(events)
     }
 
-    // (defn got-node-class (id)
-    //   (string "node-" id))
-
     /**
-     * SVG representation of it
+     * SVG representation of GoT
      * @param {number} width - in pixel
      * @param {number} height - in pixel
      * @returns {Object}
      */
-    draw(width, height) {
-        // (defn- positioned-item (n r c rng rw) {
-        //    :node      n
-        //    :row       r
-        //    :col       c
-        //    :row-range rng
-        //    :row-width rw})
-        // (defn- GoT/to-svg-impl (got) # extracts nessesary information for plotting
-        //   (let-acc @[]
-        //     (eachp [l nodes] (got :grid)
-        //       (eachp [i n] nodes
-        //         (let [idx (not-nil-indexes nodes)]
-        //           (if n (array/push acc (positioned-item n l i (keep-ends idx) (range-len idx)))))))))
-        // (defn- GoT/svg-calc-pos (item got cfg ctx)
-        //     [(+ (cfg :padx) (* (cfg :spacex)    (got :canvas-width)  (* (/ 1 (+ 1 (item :row-width))) (+ 1 (- (item :col) (first (item :row-range))))) ) (* -1 (ctx :cutx)))
-        //      (+ (cfg :pady) (* (cfg :spacey) (- (got :canvas-height) (item :row) 1)))])
-        // (defn- chop-into (len slices max)
-        //   (let [m (- max slices -1)
-        //         a (flatten [m (dup [1 m] (- slices 1))])]
-        //     (v* (/ len (sum a)) a)))
-        // (defn  GoT/to-svg [got cfg]
-        //   (def cutx (/ (* (got :canvas-width) (cfg :spacex)) (+ 1 (got :canvas-width))))
-        //   (svg/wrap 0 0
-        //     (- (+ (* 2 (cfg :padx)) (* (+  0 (got :canvas-width))  (cfg :spacex))) (* 2 cutx))
-        //     (- (+ (* 2 (cfg :pady)) (* (+ -1 (got :canvas-height)) (cfg :spacey))) 0)
-        //     (let [acc  @[]
-        //           locs @{}
-        //           ctx  {:cutx cutx}]
-        //       (each item (GoT/to-svg-impl got)
-        //         (let [pos (GoT/svg-calc-pos item got cfg ctx)]
-        //           (put locs   (item :node) pos)
-        //           (array/push acc (svg/inline :circle  {
-        //               :cx     (first pos)
-        //               :cy     (last pos)
-        //               :r      (cfg :radius)
-        //               :fill   ((cfg :color-map) (((got :nodes) (item :node)) :class))
-        //               :role    "button"
-        //               :node-id (item :node)
-        //               :type    "node"
-        //               :class (string/join [
-        //                 "node"
-        //                 (string "node-class-" (((got :nodes) (item :node)) :class))
-        //                 (got-node-class (item :node))]
-        //               " ")}))))
-        //       (each me (got :events)
-        //         (match (me :kind)
-        //             :message
-        //               (let [gr @[
-        //                 "<g
-        //                   class='message " (got-node-class (me :id)) "'"
-        //                   (string "node-id='" (me :id) "'") ">"
-        //                   ]
-        //                 ]
-        //                 (each n (me :nodes)
-        //                   (array/push gr (svg/inline :circle {
-        //                       :cx           (first (locs  n))
-        //                       :cy           (last (locs  n))
-        //                       :r            (+ (cfg :radius) (* 2 (cfg :stroke)))
-        //                       :fill         ((cfg :color-map) :thoughts)
-        //                       :role         "button"
-        //                       :type         "thought"
-        //                       :stroke       (cfg :stroke-color)
-        //                       :stroke-width (cfg :stroke)
-        //                       :stroke-dasharray "10,12"})))
-        //                 (array/push gr "</g>")
-        //                   (array/insert acc 0 (svg/normalize gr)))))
-        //       (each e (got :edges)
-        //         (let [from (first e)
-        //               to   (last  e)
-        //               head (locs from)
-        //               tail (locs to)
-        //               vec  (v- tail head)
-        //               nv   (v-norm vec)
-        //               diff (v* (+ (cfg :node-pad) (cfg :radius)) nv)
-        //               h    (v+ head diff)
-        //               t    (v- tail diff)
-        //               len  (v-mag (v- h t))
-        //               lvl  (((got :nodes) to) :height)]
-        //           (array/push acc (svg/inline :line {
-        //               :x1 (first h)
-        //               :y1 (last  h)
-        //               :x2 (first t)
-        //               :y2 (last  t)
-        //               :stroke-width     (cfg :stroke)
-        //               :stroke           (cfg :stroke-color)
-        //               :stroke-dasharray (string/join (map string (chop-into len lvl max-height)) " ")
-        //               :from-node-id from
-        //               :to-node-id   to
-        //               :class        (string "edge " (got-node-class to))
-        //             }))))
-        //       acc)))
+    toSVG(config) {
+        const cutx =
+            (config.canvas.width * config.space.x) / (config.convas.width + 1)
+
+        const w =
+            config.pad.x * 2 +
+            (got.canvas.width + 0) * config.space.x -
+            cutx * 2
+
+        const h =
+            config.pad.y * 2 + (got.canvas.height - 1) * config.space.y - 0
+
+        const acc = []
+        const locs = {}
+        const ctx = { cutx }
+
+        for (const item of toSVGImpl(this)) {
+            // (let [pos (GoT/svg-calc-pos item got cfg ctx)]
+            //   (put locs   (item :node) pos)
+            //   (array/push acc (svg/inline :circle  {
+            //       :cx     (first pos)
+            //       :cy     (last pos)
+            //       :r      (cfg :radius)
+            //       :fill   ((cfg :color-map) (((got :nodes) (item :node)) :class))
+            //       :role    "button"
+            //       :node-id (item :node)
+            //       :type    "node"
+            //       :class (string/join [
+            //         "node"
+            //         (string "node-class-" (((got :nodes) (item :node)) :class))
+            //         (got-node-class (item :node))]
+            //       " ")}))))
+        }
+
+        for (const me of this.events) {
+            // (each me (got :events)
+            //   (match (me :kind)
+            //       :message
+            //         (let [gr @[
+            //           "<g
+            //             class='message " (got-node-class (me :id)) "'"
+            //             (string "node-id='" (me :id) "'") ">"
+            //             ]
+            //           ]
+            //           (each n (me :nodes)
+            //             (array/push gr (svg/inline :circle {
+            //                 :cx           (first (locs  n))
+            //                 :cy           (last (locs  n))
+            //                 :r            (+ (cfg :radius) (* 2 (cfg :stroke)))
+            //                 :fill         ((cfg :color-map) :thoughts)
+            //                 :role         "button"
+            //                 :type         "thought"
+            //                 :stroke       (cfg :stroke-color)
+            //                 :stroke-width (cfg :stroke)
+            //                 :stroke-dasharray "10,12"})))
+            //           (array/push gr "</g>")
+            //             (array/insert acc 0 (svg/normalize gr)))))
+        }
+
+        for (const e of this.edges) {
+            // (let [from (first e)
+            //       to   (last  e)
+            //       head (locs from)
+            //       tail (locs to)
+            //       vec  (v- tail head)
+            //       nv   (v-norm vec)
+            //       diff (v* (+ (cfg :node-pad) (cfg :radius)) nv)
+            //       h    (v+ head diff)
+            //       t    (v- tail diff)
+            //       len  (v-mag (v- h t))
+            //       lvl  (((got :nodes) to) :height)]
+            //   (array/push acc (svg/inline :line {
+            //       :x1 (first h)
+            //       :y1 (last  h)
+            //       :x2 (first t)
+            //       :y2 (last  t)
+            //       :stroke-width     (cfg :stroke)
+            //       :stroke           (cfg :stroke-color)
+            //       :stroke-dasharray (string/join (map string (chop-into len lvl max-height)) " ")
+            //       :from-node-id from
+            //       :to-node-id   to
+            //       :class        (string "edge " (got-node-class to))
+            //     }))))
+        }
+
+        return {
+            tag: "svg",
+            attrs: {
+                viewport: [0, 0, w, h],
+            },
+            children: acc,
+        }
     }
 }
