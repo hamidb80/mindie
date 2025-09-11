@@ -147,26 +147,43 @@ function positionedItem(node, row, col, rowRange, rowWidth) {
     return { node, row, col, rowRange, rowWidth }
 }
 
-function toSVGImpl() {
-    // (defn- GoT/to-svg-impl (got) # extracts nessesary information for plotting
-    //   (let-acc @[]
-    //     (eachp [l nodes] (got :grid)
-    //       (eachp [i n] nodes
-    //         (let [idx (not-nil-indexes nodes)]
-    //           (if n (array/push acc (positioned-item n l i (keep-ends idx) (range-len idx)))))))))
+function keepEnds(lst) {
+    return [lst.at(0), lst.at(-1)]
+}
+function rangeLen(indexes) {
+    return indexes.at(-1) - indexes.at(0) + 1
 }
 
-function svgCalcPos() {
-    // (defn- GoT/svg-calc-pos (item got cfg ctx)
-    //     [(+ (cfg :padx) (* (cfg :spacex)    (got :canvas-width)  (* (/ 1 (+ 1 (item :row-width))) (+ 1 (- (item :col) (first (item :row-range))))) ) (* -1 (ctx :cutx)))
-    //      (+ (cfg :pady) (* (cfg :spacey) (- (got :canvas-height) (item :row) 1)))])
+function toSVGImpl(got) {
+    // extracts nessesary information for plotting
+    const acc = []
+    got.grid.forEach((nodes, l) => {
+        nodes.forEach((n, i) => {
+            if (n) {
+                const idx = notNullIndexes(nodes)
+                acc.push(positionedItem(n, l, i, keepEnds(idx), rangeLen(idx)))
+            }
+        })
+    })
+    return acc
+}
+
+function svgCalcPos(item, got, cfg, ctx) {
+    const a =
+        cfg.padx +
+        cfg.space.x *
+            got.canvas.width *
+            ((1 / (1 + item.rowWidth)) * (1 + (item.col - item.rowWidth[0]))) +
+        -1 * ctx.cutx
+    const b = cfg.pad.y + cfg.space.y * (got.canvas.height - item.row - 1)
+
+    return [a, b]
 }
 
 function chopInto(len, slices, max) {
-    // (defn- chop-into (len slices max)
-    //   (let [m (- max slices -1)
-    //         a (flatten [m (dup [1 m] (- slices 1))])]
-    //     (v* (/ len (sum a)) a)))
+    const m = max - slices + 1
+    const a = [m, dup([1, m], slices - 1)].flat()
+    return vmul(len / sum(a), a)
 }
 
 export class GraphOfThought {
@@ -195,11 +212,7 @@ export class GraphOfThought {
         const cutx =
             (config.canvas.width * config.space.x) / (config.convas.width + 1)
 
-        const w =
-            config.pad.x * 2 +
-            (got.canvas.width + 0) * config.space.x -
-            cutx * 2
-
+        const w = 2 * cfg.padx + (0 + got.canvas_width) * cfg.spacex - 2 * cutx
         const h =
             config.pad.y * 2 + (got.canvas.height - 1) * config.space.y - 0
 
