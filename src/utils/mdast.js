@@ -22,6 +22,22 @@ export function mdastTextNode(s) {
  * @param {string} s
  * @returns {object}
  */
+export function mdastInlineLatex(value) {
+    return { type: "inlineLatex", children: value }
+}
+
+/**
+ * @param {string} s
+ * @returns {object}
+ */
+export function mdastTagNode(value) {
+    return { type: "tag", value }
+}
+
+/**
+ * @param {string} s
+ * @returns {object}
+ */
 export function mdastHighlightNode(children) {
     return { type: "highlight", children }
 }

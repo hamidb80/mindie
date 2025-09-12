@@ -1,34 +1,7 @@
 {
 	"version": 1,
-	"date": "2025-09-12T06:32:12.390Z",
+	"date": "2025-09-12T08:31:15.570Z",
 	"items": {
-		"FILES/.tangent/tags": {
-			"uuid": "1f08fa0b-de36-60e0-99fe-5bde68207b10"
-		},
-		"FILES/.tangent/tangents": {
-			"uuid": "1f08fa0b-de3a-6f00-9293-685b50b79b03"
-		},
-		"FILES/.tangent/tangents/ditroid-MACHC-WAX9_0": {
-			"uuid": "1f08fa0b-dee3-6650-a514-83e8c28cdc32"
-		},
-		"FILES/.tangent/tangents/ditroid-MACHC-WAX9_0/sessions": {
-			"uuid": "1f08fa0b-e1d5-6ca0-9275-274c12a92129"
-		},
-		"FILES/.tangent/tangents/ditroid-MACHC-WAX9_0/sessions/2025-9-12_9-51-39.tangentsession": {
-			"uuid": "1f08fa0b-e1d5-6ca1-a708-20fd8e33526e"
-		},
-		"FILES/.tangent/tangents/ditroid-MACHC-WAX9_0/state": {
-			"uuid": "1f08fa0b-fb89-6610-9837-a550d90fa4b9"
-		},
-		"FILES/.tangent/tangents/ditroid-MACHC-WAX9_0/state/1f08fa0b-ddec-6d00-94e8-677dc5c8e499.noteview": {
-			"uuid": "1f08fa0b-fb89-6611-8439-f3c8773d700f"
-		},
-		"FILES/.tangent/tangents/ditroid-MACHC-WAX9_0/state/1f08fa0b-ddf4-6230-a42a-70af69a87625.noteview": {
-			"uuid": "1f08fa0c-111e-6480-9fec-b4f8eb6547eb"
-		},
-		"FILES/.tangent/tangents/ditroid-MACHC-WAX9_0/tangent.json": {
-			"uuid": "1f08fa0b-dee3-6651-9dab-6a6710c98581"
-		},
 		"FILES/ref.md": {
 			"uuid": "1f08fa0b-ddec-6d00-94e8-677dc5c8e499",
 			"modified": "2025-09-02T17:29:58.057Z",
@@ -54,33 +27,42 @@
 			]
 		},
 		"FILES/a note.md": {
-			"uuid": "1f08fa0b-de00-6580-9e9a-8aa212656dfd",
+			"uuid": "1f08fa90-10e8-6860-ae08-726d924b8448",
 			"virtual": true
 		},
 		"FILES/other note.md": {
-			"uuid": "1f08fa0b-de02-6c90-b6eb-46feb372ee66",
+			"uuid": "1f08fa90-10ed-6680-b230-ab27231cd75e",
 			"virtual": true
 		},
 		"FILES/sample.got.md": {
 			"uuid": "1f08fa0b-ddf4-6230-a42a-70af69a87625",
-			"modified": "2025-09-12T06:31:37.803Z",
+			"modified": "2025-09-12T08:29:34.058Z",
 			"structure": [
+				{
+					"type": 5,
+					"form": "tag",
+					"start": 22,
+					"end": 24,
+					"href": "1",
+					"context": "1. ==recall== `root`  #1  [[ref]]",
+					"to": "#/1"
+				},
 				{
 					"type": 0,
 					"form": "wiki",
-					"start": 22,
-					"end": 29,
+					"start": 26,
+					"end": 33,
 					"href": "ref",
-					"context": "1. ==recall== `root`  [[ref]] (1) ",
+					"context": "1. ==recall== `root`  #1  [[ref]]",
 					"to": "FILES/ref.md"
 				},
 				{
 					"type": 0,
 					"form": "wiki",
-					"start": 71,
-					"end": 78,
+					"start": 69,
+					"end": 76,
 					"href": "ref",
-					"context": "2. ==think==  [[ref]]",
+					"context": " 2. ==think==  [[ref]]",
 					"to": "FILES/ref.md"
 				}
 			]

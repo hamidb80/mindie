@@ -4,7 +4,9 @@ import gfm from "remark-gfm"
 import {
     mdastAssetNode,
     mdastHighlightNode,
+    mdastInlineLatex,
     mdastLinkNode,
+    mdastTagNode,
     mdastTextNode,
 } from "./utils/mdast.js"
 import { parseYamlAsJson } from "./utils/conventions.js"
@@ -135,6 +137,14 @@ function mineWikiLinks(mdast, urlify) {
         {
             pattern: /==(.*?)==/,
             transformer: (m) => [mdastHighlightNode([mdastTextNode(m[1])])],
+        },
+        {
+            pattern: /\$(.+?)\$/,
+            transformer: (m) => [mdastInlineLatex(m[1])],
+        },
+        {
+            pattern: /#(\S+)/,
+            transformer: (m) => [mdastTagNode(m[1])],
         },
     ]
     return transformTree(
