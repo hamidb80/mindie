@@ -233,13 +233,52 @@ function findNode(ast, cond) {
     if (cond(ast)) return ast
     else {
         for (const node of ast.children || []) {
-            if (findNode(node, cond)) return node
+            const ret = findNode(node, cond)
+            if (ret) return ret
             else continue
         }
     }
 }
 
 export function parseGoT(parsedMd) {
-    // then parse list items
-    const firstList = findNode(parsedMd, (n) => n.type == "list")
+    // extract this structure
+    // list:
+    //   listItem
+    //      paragraph
+    //        hightlight
+    //          text <-- type
+    //        inlineCode <-- name
+    //        tag <-- height
+    //        link <-- ref
+    //      list
+    //        listItem
+    //          paragraph
+    //            link <-- dep 1
+
+    const mainList = findNode(parsedMd, (n) => n.type == "list")
+    if (mainList) {
+        return mainList.children.map((li) => {
+            const p = findNode(li, (n) => n.type == "paragraph")
+            const h = findNode(p, (n) => n.type == "highlight")
+            const c = findNode(p, (n) => n.type == "inlineCode")
+            const t = findNode(p, (n) => n.type == "tag")
+            const l = findNode(p, (n) => n.type == "link")
+
+            const d = findNode(li, (n) => n.type == "list")
+
+            console.log({ h, c, t, l })
+
+            return {
+                id: c?.value,
+                kind: h.children[0].value,
+                level: t?.value,
+                content: l.url,
+                parents: d?.children?.map(
+                    (lr) => findNode(lr, (n) => n.type == "inlineCode").value,
+                ),
+            }
+        })
+    } else {
+        throw "cannot find the main list in the got file"
+    }
 }
