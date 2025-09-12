@@ -5,7 +5,7 @@ import { packageDirectory } from "package-directory"
 import { Edge } from "edge.js"
 
 import { FileTree } from "../utils/filetree.js"
-import { parseGoT, parseMarkdown } from "../parser.js"
+import { noteType, parseGoT, parseMarkdown } from "../parser.js"
 import { md2HtmlRaw } from "../render.js"
 import { digestWorkspace } from "../engine.js"
 
@@ -23,17 +23,15 @@ edge.mount(path.join(projectdir, "views"))
  * @param {object} data
  * @returns {Promise<string>}
  */
-function render(viewname, data) {
+export function render(viewname, data) {
     return edge.render(viewname, data)
 }
-
-// ----------------------------------------------
 
 /**
  * @param {FileTree} filetree
  * @param {string} fnameQuery
  */
-async function resolveNote(filetree, fnameQuery) {
+export async function resolveNote(filetree, fnameQuery) {
     const candidateFiles = filetree.findFiles("/" + fnameQuery)
 
     if (candidateFiles.length == 0) {
@@ -47,15 +45,28 @@ async function resolveNote(filetree, fnameQuery) {
         if (pinfo.ext == ".md") {
             const content = fs.readFileSync(fpath, "utf-8") // TODO convert to readfile async
             const pparts = fpath.split("/")
+            const nt = noteType(relpath)
             const md = parseMarkdown(content, relpath)
-            const html = md2HtmlRaw(md.ast)
-            const page = await render("note-page", {
-                content: html,
-                pathParts: pparts,
-                router: (x) => x,
-            })
 
-            fs.writeFileSync("./play.html", page) // convert to write async
+            if (nt == "got") {
+                const got = parseGoT(md)
+                const page = await render("got", {
+                    content: html,
+                    pathParts: pparts,
+                    router: (x) => x,
+                })
+            } else if (nt == "md") {
+                const html = md2HtmlRaw(md.ast)
+                const page = await render("note", {
+                    content: html,
+                    pathParts: pparts,
+                    router: (x) => x,
+                })
+
+                fs.writeFileSync("./play.html", page) // convert to write async
+            } else {
+                throw "impossible"
+            }
         } else {
             throw "the file is not a note (i.e. does not have .md extension)"
         }
@@ -63,24 +74,4 @@ async function resolveNote(filetree, fnameQuery) {
         console.log(candidateFiles)
         throw "found more than 1"
     }
-}
-
-// -----------------------------------------------------------
-
-const wdir = "/home/ditroid/Documents/network-security/"
-{
-    const filetree = new FileTree(wdir)
-
-    console.log(filetree.findFiles(".md"))
-    resolveNote(filetree, "readme.md")
-}
-{
-    // XXX create syntax for GoT in .md
-
-    const p = path.join(projectdir, "./tests/cases/sample.got.md")
-    const c = fs.readFileSync(p, "utf-8")
-    const d = parseMarkdown(c)
-    console.dir(d.ast.children, { depth: null })
-    const j = parseGoT(d.ast)
-    console.dir(j, { depth: null })
 }

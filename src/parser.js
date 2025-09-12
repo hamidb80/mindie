@@ -282,3 +282,15 @@ export function parseGoT(parsedMd) {
         throw "cannot find the main list in the got file"
     }
 }
+
+// ---------------------------------------------------------------------
+
+/**
+ * @summary determines the note type from its file name
+ * @param {string} fname
+ */
+export function noteType(fname) {
+    if (fname.endsWith(".got.md")) return "got"
+    else if (fname.endsWith(".md")) return "md"
+    else return "other"
+}

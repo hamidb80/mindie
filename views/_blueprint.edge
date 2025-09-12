@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <title>{{title}}</title>
-    @!component("common-head", {router})
+    @!component("_common-head", {router})
   </head>
   <body>
     <div class="breakpoints">
@@ -12,7 +12,7 @@
       <div id="" class="d-none d-xl-block"></div>
       <div id="" class="d-none d-xxl-block"></div>
     </div>
-    @!component("nav-path", {pathParts})
+    @!component("_nav-path", {pathParts})
     <main>
       {{{ await $slots.main() }}}
     </main>
