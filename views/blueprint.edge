@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <title>{{title}}</title>
-    {{common-head(router mangle)}}
+    @!component("common-head", {router})
   </head>
   <body>
     <div class="breakpoints">
@@ -12,9 +12,9 @@
       <div id="" class="d-none d-xl-block"></div>
       <div id="" class="d-none d-xxl-block"></div>
     </div>
-    {{(nav-bar (router "" :page) (app-config :title))}}
+    @!component("nav-path", {pathParts})
     <main>
-      {{{body}}}
+      {{{ await $slots.main() }}}
     </main>
   </body>
 </html>

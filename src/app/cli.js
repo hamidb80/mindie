@@ -14,7 +14,7 @@ import { digestWorkspace } from "../engine.js"
 const projectdir = await packageDirectory()
 
 const edge = Edge.create()
-edge.mount(projectdir)
+edge.mount(path.join(projectdir, "views"))
 
 // ----------------------------------------------
 
@@ -42,13 +42,20 @@ async function resolveNote(filetree, fnameQuery) {
         // correct
         const relpath = candidateFiles[0]
         const fpath = path.join(wdir, relpath)
+        const pinfo = path.parse(fpath)
 
         if (pinfo.ext == ".md") {
-            const content = readFileSync(fpath)
-            const md = parseMarkdown(content, relpath, noteUrlGen)
+            const content = fs.readFileSync(fpath, "utf-8") // TODO convert to readfile async
+            const pparts = fpath.split("/")
+            const md = parseMarkdown(content, relpath)
             const html = md2HtmlRaw(md.ast)
-            const page = await render("note", { html })
-            fs.writeFile("./play.html", page)
+            const page = await render("note-page", {
+                content: html,
+                pathParts: pparts,
+                router: (x) => x,
+            })
+
+            fs.writeFileSync("./play.html", page) // convert to write async
         } else {
             throw "the file is not a note (i.e. does not have .md extension)"
         }
@@ -64,3 +71,4 @@ const wdir = "/home/ditroid/Documents/network-security/"
 const filetree = new FileTree(wdir)
 
 console.log(filetree.findFiles(".md"))
+resolveNote(filetree, "readme.md")
