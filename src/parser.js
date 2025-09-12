@@ -1,10 +1,10 @@
 import { remark } from "remark"
 import gfm from "remark-gfm"
 
-import { mdastAssetNode, mdastLinkNode, mdastTextNode } from "../utils/mdast.js"
-import { parseYamlAsJson } from "../utils/conventions.js"
+import { mdastAssetNode, mdastLinkNode, mdastTextNode } from "./utils/mdast.js"
+import { parseYamlAsJson } from "./utils/conventions.js"
 import { FileTree } from "./utils/filetree.js"
-import { pop, rev } from "../utils/array.js"
+import { pop, rev } from "./utils/array.js"
 
 // ------------------------------------------------------
 

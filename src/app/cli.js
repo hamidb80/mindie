@@ -1,17 +1,13 @@
 import * as path from "path"
-import { fileURLToPath } from "url"
+import fs from "fs"
 
 import { packageDirectory } from "package-directory"
 import { Edge } from "edge.js"
 
-import {
-    digestWorkspace,
-    md2HtmlRaw,
-    parseMarkdown,
-    parseQuery,
-    queryNote,
-} from "../core.js"
 import { FileTree } from "../utils/filetree.js"
+import { parseMarkdown } from "../parser.js"
+import { md2HtmlRaw } from "../render.js"
+import { digestWorkspace } from "../engine.js"
 
 // ----------------------------------------------
 
@@ -22,65 +18,49 @@ edge.mount(projectdir)
 
 // ----------------------------------------------
 
+/**
+ * @param {string} viewname
+ * @param {object} data
+ * @returns {Promise<string>}
+ */
 function render(viewname, data) {
-    edge.render(viewname, data)
-        .then((page) => res.send(page))
-        .catch(console.err)
+    return edge.render(viewname, data)
 }
 
-function resolveNote(stree, nameQuery) {
-    const result = stree.endsWith("/" + shortenPath)
+// ----------------------------------------------
 
-    if (result.length == 0) {
-        if (pinfo.ext.toLowerCase() != ".md") {
-            res.redirect(noteUrlGen(shortenPath + ".md"))
-        } else {
-            res.send("invalid path: " + shortenPath)
-        }
-    } else if (result.length == 1) {
+/**
+ * @param {FileTree} filetree
+ * @param {string} fnameQuery
+ */
+async function resolveNote(filetree, fnameQuery) {
+    const candidateFiles = filetree.findFiles("/" + fnameQuery)
+
+    if (candidateFiles.length == 0) {
+        throw "could not find any"
+    } else if (candidateFiles.length == 1) {
         // correct
-        const relpath = result[0][0]
+        const relpath = candidateFiles[0]
         const fpath = path.join(wdir, relpath)
 
         if (pinfo.ext == ".md") {
             const content = readFileSync(fpath)
             const md = parseMarkdown(content, relpath, noteUrlGen)
             const html = md2HtmlRaw(md.ast)
-            res.tmpl("note", { html })
+            const page = await render("note", { html })
+            fs.writeFile("./play.html", page)
         } else {
-            res.sendFile(fpath)
+            throw "the file is not a note (i.e. does not have .md extension)"
         }
     } else {
-        // more than 1
+        console.log(candidateFiles)
+        throw "found more than 1"
     }
 }
-/*
- * @param {String} wdir
- */
-function buildStaticWebWiki(wdir, outdir, urlPrefix) {
-    const ftree = FileTree(wdir)
-    const wctx = digestWorkspace(stree, wdir)
-    const sliceNotes = arrayShuffle(
-        stree
-            .endsWith(".md")
-            .map((it) => it[0])
-            .map((relpath) => {
-                const fpath = path.join(wdir, relpath)
-                const parts = path.parse(fpath)
-                const content = readFileSync(fpath)
-                const md = parseMarkdown(content, relpath, noteUrlGen)
-                const highlights = md.frontMatter?.highlights ?? []
-                const queries = highlights.map(parseQuery)
-                const nodes = queries.map((q) => queryNote(md.ast, q))
-                const htmls = nodes.map(md2HtmlRaw)
-                const slices = htmls.map((html) => ({
-                    html,
-                    title: md.frontMatter?.title ?? parts.name,
-                    url: noteUrlGen(relpath),
-                }))
-                return slices
-            })
-            .flat(),
-    )
-    res.tmpl("drawer", { title: "Home", sliceNotes })
-}
+
+// -----------------------------------------------------------
+
+const wdir = "/home/ditroid/Documents/network-security/"
+const filetree = new FileTree(wdir)
+
+console.log(filetree.findFiles(".md"))

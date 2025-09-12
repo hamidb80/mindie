@@ -1,7 +1,7 @@
 import * as path from "path"
 
-import { toTextRepr } from "./render"
-import { visitTree } from "./core"
+import { toTextRepr } from "./render.js"
+import { visitTree } from "./parser.js"
 
 // ------------------------------------------------------
 

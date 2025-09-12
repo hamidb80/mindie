@@ -1,3 +1,5 @@
+import path from "path"
+
 import { Suffixer } from "suffixer"
 import fg from "fast-glob"
 
@@ -5,17 +7,19 @@ import { COMMON_FILE_EXTS } from "../common.js"
 
 // --------------------------------------------------
 
-function firstItem(t) {
+function first(t) {
     return t[0]
 }
 
 export class FileTree {
     /**
      * @param {string} dir - directory
+     * @param {string[]} [fileFormats=COMMON_FILE_EXTS]
      */
     constructor(dir, fileFormats = COMMON_FILE_EXTS) {
         const formats = fileFormats.join(",")
         const pattern = `${dir}**/*{${formats}}`
+        console.log(pattern)
         const filePaths = fg
             .globSync(pattern)
             .map((p) => "./" + path.relative(dir, p))
@@ -23,6 +27,6 @@ export class FileTree {
     }
 
     findFiles(suffix) {
-        return this.stree.endsWith(suffix).map(firstItem)
+        return this.stree.endsWith(suffix).map(first)
     }
 }
