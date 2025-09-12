@@ -1,3 +1,5 @@
+import { vadd, vsub, vsum, vmag, vmul, vnorm } from "./utils/vector.js"
+
 // XXX use ast packages (like mdast for markdown) to convert to SVG (which is XML)
 
 // public interface ------------------------
@@ -216,85 +218,92 @@ export class GraphOfThought {
         const h =
             config.pad.y * 2 + (got.canvas.height - 1) * config.space.y - 0
 
-        const acc = []
+        const children = []
         const locs = {}
         const ctx = { cutx }
 
         for (const item of toSVGImpl(this)) {
-            // (let [pos (GoT/svg-calc-pos item got cfg ctx)]
-            //   (put locs   (item :node) pos)
-            //   (array/push acc (svg/inline :circle  {
-            //       :cx     (first pos)
-            //       :cy     (last pos)
-            //       :r      (cfg :radius)
-            //       :fill   ((cfg :color-map) (((got :nodes) (item :node)) :class))
-            //       :role    "button"
-            //       :node-id (item :node)
-            //       :type    "node"
-            //       :class (string/join [
-            //         "node"
-            //         (string "node-class-" (((got :nodes) (item :node)) :class))
-            //         (got-node-class (item :node))]
-            //       " ")}))))
+            const pos = svgCalcPos(item, git, cfg, ctx)
+            locs[item.node] = pos
+
+            children.push({
+                tag: "circle",
+                attrs: {
+                    cx: first(pos),
+                    cy: last(pos),
+                    r: cfg.radius,
+                    fill: cfg.color_map[got.nodes[item.node].class],
+                    role: "button",
+                    "node-id": item.node,
+                    type: "node",
+                    class: `node node-class-${got.nodes[item.node].class} ${nodeClass(item.node)}`,
+                },
+            })
         }
 
-        for (const me of this.events) {
-            // (each me (got :events)
-            //   (match (me :kind)
-            //       :message
-            //         (let [gr @[
-            //           "<g
-            //             class='message " (got-node-class (me :id)) "'"
-            //             (string "node-id='" (me :id) "'") ">"
-            //             ]
-            //           ]
-            //           (each n (me :nodes)
-            //             (array/push gr (svg/inline :circle {
-            //                 :cx           (first (locs  n))
-            //                 :cy           (last (locs  n))
-            //                 :r            (+ (cfg :radius) (* 2 (cfg :stroke)))
-            //                 :fill         ((cfg :color-map) :thoughts)
-            //                 :role         "button"
-            //                 :type         "thought"
-            //                 :stroke       (cfg :stroke-color)
-            //                 :stroke-width (cfg :stroke)
-            //                 :stroke-dasharray "10,12"})))
-            //           (array/push gr "</g>")
-            //             (array/insert acc 0 (svg/normalize gr)))))
-        }
+        children.push(
+            ...this.events
+                .filter((it) => it.kind == "message")
+                .map((me) => ({
+                    tag: "g",
+                    attrs: {
+                        class: `message ${nodeClass(me.id)}`,
+                        "node-id": me.id,
+                    },
+                    children: me.nodes.map((n) => ({
+                        type: "circle",
+                        attrs: {
+                            cx: first(locs[n]),
+                            cy: last(locs[n]),
+                            r: cfg.radius + cfg.stroke * 2,
+                            fill: cfg.colorMap.thoughts,
+                            role: "button",
+                            type: "thought",
+                            stroke: cfg.strokeColor,
+                            "stroke-width": cfg.stroke,
+                            "stroke-dasharray": "10,12",
+                        },
+                    })),
+                })),
+        )
 
         for (const e of this.edges) {
-            // (let [from (first e)
-            //       to   (last  e)
-            //       head (locs from)
-            //       tail (locs to)
-            //       vec  (v- tail head)
-            //       nv   (v-norm vec)
-            //       diff (v* (+ (cfg :node-pad) (cfg :radius)) nv)
-            //       h    (v+ head diff)
-            //       t    (v- tail diff)
-            //       len  (v-mag (v- h t))
-            //       lvl  (((got :nodes) to) :height)]
-            //   (array/push acc (svg/inline :line {
-            //       :x1 (first h)
-            //       :y1 (last  h)
-            //       :x2 (first t)
-            //       :y2 (last  t)
-            //       :stroke-width     (cfg :stroke)
-            //       :stroke           (cfg :stroke-color)
-            //       :stroke-dasharray (string/join (map string (chop-into len lvl max-height)) " ")
-            //       :from-node-id from
-            //       :to-node-id   to
-            //       :class        (string "edge " (got-node-class to))
-            //     }))))
+            const from = first(e)
+            const to = last(e)
+            const head = locs[from]
+            const tail = locs[to]
+            const vec = vsub(tail, head)
+            const nv = vnorm(vec)
+            const diff = vmul(cfg.node_pad + cfg.radius, nv)
+            const h = vadd(head, diff)
+            const t = vsub(tail, diff)
+            const len = vmag(vsub(h, t))
+            const lvl = got.nodes[to].height
+
+            children.push({
+                tag: "line",
+                attrs: {
+                    x1: h[0],
+                    y1: h[1],
+                    x2: t[0],
+                    y2: t[1],
+                    "stroke-width": cfg.stroke,
+                    stroke: cfg.strokeColor,
+                    "stroke-dasharray": chopInto(len, lvl, maxHeight).join(" "),
+                    "from-node-id": from,
+                    "to-node-id": to,
+                    class: `edge ${nodeClass(to)}`,
+                },
+            })
         }
 
         return {
             tag: "svg",
             attrs: {
+                xmlns: "http://www.w3.org/2000/svg",
                 viewport: [0, 0, w, h],
             },
-            children: acc,
+            children,
         }
     }
 }
