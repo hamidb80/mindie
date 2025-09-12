@@ -1,0 +1,55 @@
+{
+	"threadHistory": [
+		{
+			"thread": [
+				"FILES/ref.md"
+			],
+			"currentNode": "FILES/ref.md"
+		},
+		{
+			"thread": [
+				"FILES/sample.got.md"
+			],
+			"currentNode": "FILES/sample.got.md"
+		},
+		{
+			"thread": [
+				"FILES/ref.md"
+			],
+			"currentNode": "FILES/ref.md"
+		},
+		{
+			"thread": [
+				"FILES/sample.got.md"
+			],
+			"currentNode": "FILES/sample.got.md"
+		}
+	],
+	"threadIndex": 3,
+	"previousSession": "",
+	"map": {
+		"nodes": {
+			"FILES/ref.md": {
+				"node": "FILES/ref.md",
+				"isRoot": true,
+				"strength": 3,
+				"dateCreated": "2025-09-12T06:21:42.262Z"
+			},
+			"FILES/sample.got.md": {
+				"node": "FILES/sample.got.md",
+				"isRoot": true,
+				"strength": 3,
+				"dateCreated": "2025-09-12T06:21:44.521Z"
+			}
+		},
+		"connections": [
+			{
+				"from": "FILES/sample.got.md",
+				"to": "FILES/ref.md",
+				"strength": 1,
+				"dateCreated": "2025-09-12T06:26:53.783Z"
+			}
+		]
+	},
+	"version": 1
+}

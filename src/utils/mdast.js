@@ -19,6 +19,14 @@ export function mdastTextNode(s) {
 }
 
 /**
+ * @param {string} s
+ * @returns {object}
+ */
+export function mdastHighlightNode(children) {
+    return { type: "highlight", children }
+}
+
+/**
  * @param {string} url
  * @param {Array} children
  * @returns {object}

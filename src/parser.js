@@ -1,7 +1,12 @@
 import { remark } from "remark"
 import gfm from "remark-gfm"
 
-import { mdastAssetNode, mdastLinkNode, mdastTextNode } from "./utils/mdast.js"
+import {
+    mdastAssetNode,
+    mdastHighlightNode,
+    mdastLinkNode,
+    mdastTextNode,
+} from "./utils/mdast.js"
 import { parseYamlAsJson } from "./utils/conventions.js"
 import { FileTree } from "./utils/filetree.js"
 import { pop, rev } from "./utils/array.js"
@@ -116,25 +121,36 @@ export function parseQuery(h) {
  * @returns the changed `mdast`
  */
 function mineWikiLinks(mdast, urlify) {
+    const cases = [
+        {
+            pattern: /!?\[\[([^\n*:]*?)\]\]/,
+            transformer: (match, node) => [
+                mdastTextNode(node.value.slice(0, match.index)),
+                match[0].charAt(0) == "!"
+                    ? mdastAssetNode(urlify(match[1]))
+                    : mdastLinkNode(urlify(match[1]), []),
+                mdastTextNode(node.value.slice(match.index + match[0].length)),
+            ],
+        },
+        {
+            pattern: /==(.*?)==/,
+            transformer: (m) => [mdastHighlightNode([mdastTextNode(m[1])])],
+        },
+    ]
     return transformTree(
         mdast,
         (n) => n.type == "text",
         (node) => {
-            const patt = /!?\[\[([^\n*:]*?)\]\]/
-            const match = patt.exec(node.value)
-            if (match) {
-                return [
-                    mdastTextNode(node.value.slice(0, match.index)),
-                    match[0].charAt(0) == "!"
-                        ? mdastAssetNode(urlify(match[1]))
-                        : mdastLinkNode(urlify(match[1]), [
-                              mdastTextNode(match[1]),
-                          ]),
-                    mdastTextNode(
-                        node.value.slice(match.index + match[0].length),
-                    ),
-                ].filter((n) => n.value !== "")
-            } else return [node]
+            let repl = undefined
+
+            for (const c of cases) {
+                const match = c.pattern.exec(node.value)
+                if (match) {
+                    repl = c.transformer(match, node)
+                    break
+                }
+            }
+            return repl ? repl : [node]
         },
     )
 }
@@ -201,4 +217,19 @@ export function parseMarkdown(txt, path, urlify = (i) => i) {
             ast: parseFinal(txt),
             path,
         }
+}
+
+function findNode(ast, cond) {
+    if (cond(ast)) return ast
+    else {
+        for (const node of ast.children || []) {
+            if (findNode(node, cond)) return node
+            else continue
+        }
+    }
+}
+
+export function parseGoT(parsedMd) {
+    // then parse list items
+    const firstList = findNode(parsedMd, (n) => n.type == "list")
 }
