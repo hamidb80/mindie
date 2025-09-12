@@ -1,3 +1,8 @@
+import path from "path"
+
+import { packageDirectory } from "package-directory"
+import { Edge } from "edge.js"
+
 import * as htmlUtils from "hast-util-to-html"
 import * as hastUtils from "mdast-util-to-hast"
 
@@ -34,6 +39,20 @@ export function toTextRepr(node) {
 export function md2HtmlRaw(mdast) {
     const hast = hastUtils.toHast(mdast)
     const html = htmlUtils.toHtml(hast)
-    console.dir(hast, { depth: null })
     return html
+}
+
+// ----------------------------------------------
+
+const projectdir = await packageDirectory()
+const edge = Edge.create()
+edge.mount(path.join(projectdir, "views"))
+
+/**
+ * @param {string} viewname
+ * @param {object} data
+ * @returns {Promise<string>}
+ */
+export function fromTemplate(viewname, data) {
+    return edge.render(viewname, data)
 }

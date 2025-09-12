@@ -23,7 +23,7 @@ export function mdastTextNode(s) {
  * @returns {object}
  */
 export function mdastInlineLatex(value) {
-    return { type: "inlineLatex", children: value }
+    return { type: "inlineLatex", value }
 }
 
 /**
@@ -55,7 +55,8 @@ export function mdastLinkNode(url, children) {
  * @param {string} url
  * @returns {object}
  */
-export function mdastAssetNode(url) {
+export function mdastAssetNode(urlWithOptions) {
+    const [url, options] = urlWithOptions.split("|")
     const info = path.parse(url)
 
     if (IMAGE_FILE_EXTS.includes(info.ext)) {

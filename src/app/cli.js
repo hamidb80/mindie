@@ -1,77 +1,58 @@
 import * as path from "path"
 import fs from "fs"
 
-import { packageDirectory } from "package-directory"
-import { Edge } from "edge.js"
-
 import { FileTree } from "../utils/filetree.js"
 import { noteType, parseGoT, parseMarkdown } from "../parser.js"
-import { md2HtmlRaw } from "../render.js"
-import { digestWorkspace } from "../engine.js"
-
-// ----------------------------------------------
-
-const projectdir = await packageDirectory()
-
-const edge = Edge.create()
-edge.mount(path.join(projectdir, "views"))
+import { fromTemplate, md2HtmlRaw } from "../render.js"
+// import { digestWorkspace } from "../engine.js"
 
 // ----------------------------------------------
 
 /**
- * @param {string} viewname
- * @param {object} data
- * @returns {Promise<string>}
- */
-export function render(viewname, data) {
-    return edge.render(viewname, data)
-}
-
-/**
+ * @summary iterate through files -> maybe compile -> write
  * @param {FileTree} filetree
- * @param {string} fnameQuery
+ * @param {string -> string} pathDispatcher
  */
-export async function resolveNote(filetree, fnameQuery) {
-    const candidateFiles = filetree.findFiles("/" + fnameQuery)
+export async function compile(wdir, filetree, pathDispatcher, router) {
+    for (const relpath of filetree.allFiles()) {
+        const inpath = path.join(wdir, relpath)
+        const outpath = pathDispatcher(relpath)
+        const ppin = path.parse(relpath)
+        const ppout = path.parse(outpath)
+        const nt = noteType(relpath)
 
-    if (candidateFiles.length == 0) {
-        throw "could not find any"
-    } else if (candidateFiles.length == 1) {
-        // correct
-        const relpath = candidateFiles[0]
-        const fpath = path.join(wdir, relpath)
-        const pinfo = path.parse(fpath)
+        // TODO use async version
 
-        if (pinfo.ext == ".md") {
-            const content = fs.readFileSync(fpath, "utf-8") // TODO convert to readfile async
-            const pparts = fpath.split("/")
-            const nt = noteType(relpath)
+        fs.mkdirSync(ppout.dir, { recursive: true })
+
+        if (nt == "other") {
+            console.log(`[COPY] ${inpath} -> ${outpath}`)
+            fs.copyFileSync(inpath, outpath)
+        } else {
+            const content = fs.readFileSync(inpath, "utf-8")
             const md = parseMarkdown(content, relpath)
 
+            console.log(`[PROC] ${inpath} -> ${outpath}`)
             if (nt == "got") {
                 const got = parseGoT(md)
-                const page = await render("got", {
-                    content: html,
-                    pathParts: pparts,
-                    router: (x) => x,
+                const html = await fromTemplate("got", {
+                    got,
+                    pinfo: ppin,
+                    router,
                 })
+                fs.writeFileSync(outpath, html)
             } else if (nt == "md") {
-                const html = md2HtmlRaw(md.ast)
-                const page = await render("note", {
-                    content: html,
-                    pathParts: pparts,
-                    router: (x) => x,
+                const content = md2HtmlRaw(md.ast)
+                const html = await fromTemplate("note", {
+                    content,
+                    pinfo: ppin,
+                    router,
                 })
-
-                fs.writeFileSync("./play.html", page) // convert to write async
+                fs.writeFileSync(outpath, html)
             } else {
-                throw "impossible"
+                throw "unreachable"
             }
-        } else {
-            throw "the file is not a note (i.e. does not have .md extension)"
         }
-    } else {
-        console.log(candidateFiles)
-        throw "found more than 1"
     }
+    console.log(`[DONE] compiling`)
 }

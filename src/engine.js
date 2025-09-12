@@ -84,6 +84,29 @@ function revRefTable(links) {
 }
 
 /**
+ * @param {FileTree} ftree
+ * @param {object} md
+ */
+export function extractLocalLinks(ftree, md) {
+    let forwards = new Set()
+
+    visitTree(md.ast, (node) => {
+        if (node.type == "link" && !node.url?.includes("://")) {
+            const references = ftree
+                .endsWith(node.url + ".md")
+                .map((it) => it[0])
+
+            for (const r of references) {
+                forwards.add(r)
+            }
+        }
+        return true
+    })
+
+    return forwards
+}
+
+/**
  * gathers general data/metadata from workspace to feed into subsequent operations
  * @param {FileTree} ftree
  * @returns {Object}

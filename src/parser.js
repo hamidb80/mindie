@@ -10,7 +10,6 @@ import {
     mdastTextNode,
 } from "./utils/mdast.js"
 import { parseYamlAsJson } from "./utils/conventions.js"
-import { FileTree } from "./utils/filetree.js"
 import { pop, rev } from "./utils/array.js"
 
 // ------------------------------------------------------
@@ -130,7 +129,9 @@ function mineWikiLinks(mdast, urlify) {
                 mdastTextNode(node.value.slice(0, match.index)),
                 match[0].charAt(0) == "!"
                     ? mdastAssetNode(urlify(match[1]))
-                    : mdastLinkNode(urlify(match[1]), []),
+                    : mdastLinkNode(urlify(match[1]), [
+                          mdastTextNode(match[1]),
+                      ]),
                 mdastTextNode(node.value.slice(match.index + match[0].length)),
             ],
         },
@@ -163,29 +164,6 @@ function mineWikiLinks(mdast, urlify) {
             return repl ? repl : [node]
         },
     )
-}
-
-/**
- * @param {FileTree} ftree
- * @param {object} md
- */
-export function extractLocalLinks(ftree, md) {
-    let forwards = new Set()
-
-    visitTree(md.ast, (node) => {
-        if (node.type == "link" && !node.url?.includes("://")) {
-            const references = ftree
-                .endsWith(node.url + ".md")
-                .map((it) => it[0])
-
-            for (const r of references) {
-                forwards.add(r)
-            }
-        }
-        return true
-    })
-
-    return forwards
 }
 
 // ------------------------------------------
@@ -263,15 +241,11 @@ export function parseGoT(parsedMd) {
             const c = findNode(p, (n) => n.type == "inlineCode")
             const t = findNode(p, (n) => n.type == "tag")
             const l = findNode(p, (n) => n.type == "link")
-
             const d = findNode(li, (n) => n.type == "list")
-
-            console.log({ h, c, t, l })
-
             return {
                 id: c?.value,
                 kind: h.children[0].value,
-                level: t?.value,
+                height: t?.value,
                 content: l.url,
                 parents: d?.children?.map(
                     (lr) => findNode(lr, (n) => n.type == "inlineCode").value,
