@@ -30,7 +30,7 @@ export async function compile(wdir, filetree, pathDispatcher, router) {
             fs.copyFileSync(inpath, outpath)
         } else {
             const content = fs.readFileSync(inpath, "utf-8")
-            const md = parseMarkdown(content, relpath)
+            const md = parseMarkdown(content, relpath, router)
 
             console.log(`[PROC] ${inpath} -> ${outpath}`)
             if (nt == "got") {

@@ -27,7 +27,11 @@ export class FileTree {
     }
 
     findFiles(suffix) {
-        return this.stree.endsWith(suffix).map(first)
+        try {
+            return this.stree?.endsWith(suffix)?.map(first)
+        } catch (e) {
+            return []
+        }
     }
 
     allFiles() {
