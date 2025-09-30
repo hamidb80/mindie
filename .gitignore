@@ -8,3 +8,5 @@ play/
 
 .env
 play.*
+
+.tangent
