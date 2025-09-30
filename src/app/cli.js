@@ -4,6 +4,7 @@ import fs from "fs"
 import fg from "fast-glob"
 import { readPackage } from "read-pkg"
 import appRoot from "app-root-path"
+import i18n from "i18n"
 
 import { FileTree } from "../utils/filetree.js"
 import { noteType, parseGoT, parseMarkdown } from "../parser.js"
@@ -11,6 +12,20 @@ import { fromTemplate, md2HtmlRaw } from "../render.js"
 // import { digestWorkspace } from "../engine.js"
 
 // ----------------------------------------------
+
+i18n.configure({
+    locales: ["en"],
+    directory: path.join(appRoot.path, "locales"),
+    defaultLocale: "en",
+    objectNotation: true,
+})
+
+// Export a simple function
+function dict(key, locale = "en", args = {}) {
+    return i18n.__({ phrase: key, locale }, args)
+}
+
+// -----------------------------------------------
 
 const pkg = await readPackage()
 
@@ -43,6 +58,7 @@ export async function compile(wdir, filetree, pathDispatcher, router) {
                     got,
                     pinfo: ppin,
                     router,
+                    dict,
                 })
                 fs.writeFileSync(outpath, html)
             } else if (nt == "md") {
@@ -51,6 +67,7 @@ export async function compile(wdir, filetree, pathDispatcher, router) {
                     content,
                     pinfo: ppin,
                     router,
+                    dict,
                 })
                 fs.writeFileSync(outpath, html)
             } else {

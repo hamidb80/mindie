@@ -1,12 +1,14 @@
 import path from "path"
 
+import appRoot from "app-root-path"
+
 import { compile } from "../src/app/cli.js"
 import { FileTree } from "../src/utils/filetree.js"
-import { findSourceMap } from "module"
 
 // -------------------------------------------------------
 
-const wdir = "/home/ditroid/Documents/network-security/"
+// const wdir = "/home/ditroid/Documents/network-security/"
+const wdir = path.join(appRoot.path, "tests", "cases")
 const outdir = "./temp/"
 
 const filetree = new FileTree(wdir)
@@ -18,6 +20,7 @@ const newpath = (relpath) => {
             : path.join(outdir, relpath)
     return newpath
 }
+// TODO add file dispatcher
 const router = (x) => {
     console.log("------------------->?????????????????????????????")
 

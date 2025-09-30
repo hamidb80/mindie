@@ -162,7 +162,7 @@ function mineWikiLinks(mdast, urlify) {
                 }
             }
             return repl ? repl : [node]
-        },
+        }
     )
 }
 
@@ -233,7 +233,7 @@ export function parseGoT(parsedMd) {
     //          paragraph
     //            link <-- dep 1
 
-    const mainList = findNode(parsedMd, (n) => n.type == "list")
+    const mainList = findNode(parsedMd.ast, (n) => n.type == "list")
     if (mainList) {
         return mainList.children.map((li) => {
             const p = findNode(li, (n) => n.type == "paragraph")
@@ -248,11 +248,12 @@ export function parseGoT(parsedMd) {
                 height: t?.value,
                 content: l.url,
                 parents: d?.children?.map(
-                    (lr) => findNode(lr, (n) => n.type == "inlineCode").value,
+                    (lr) => findNode(lr, (n) => n.type == "inlineCode").value
                 ),
             }
         })
     } else {
+        // console.dir(parsedMd, { depth: null })
         throw "cannot find the main list in the got file"
     }
 }
