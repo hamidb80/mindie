@@ -1,5 +1,5 @@
 1. ==problem== `root` #1 [[ref]]
-2. ==think== `hell`  [[ref]]
+2. ==thought== `hell`  [[ref]]
 	- `root`
 3. ==reason== `start-to-understand-problem` #2 [[ref]]
 	- `root`
