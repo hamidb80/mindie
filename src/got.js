@@ -324,7 +324,7 @@ export class GraphOfThought {
                         class: `message ${nodeClassName(me.id)}`,
                         "node-id": me.id,
                     },
-                    children: me.nodes.map((n) => ({
+                    children: me.parents.map((n) => ({
                         type: "circle",
                         attrs: {
                             cx: first(locs[n]),
@@ -332,7 +332,7 @@ export class GraphOfThought {
                             r: config.radius + config.stroke * 2,
                             fill: config.colorMap.thoughts,
                             role: "button",
-                            type: "thought",
+                            type: "message",
                             stroke: config.strokeColor,
                             "stroke-width": config.stroke,
                             "stroke-dasharray": "10,12",

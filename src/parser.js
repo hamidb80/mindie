@@ -246,7 +246,7 @@ export function parseGoT(parsedMd) {
             let k = h.children[0].value
             return {
                 id: c?.value,
-                kind: k === "think" ? "think" : "node",
+                kind: k === "think" ? "message" : "node",
                 class: k,
                 height: t?.value,
                 content: l.url,
