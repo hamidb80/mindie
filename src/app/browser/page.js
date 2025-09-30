@@ -128,14 +128,6 @@ up.compiler(".latex", (el, data) => {
     katex.render(el.innerText, el, { displayMode: data.display == "true" })
 })
 
-up.compiler(".toggle-graph-message-btn", (el) => {
-    el.onclick = () => {
-        let p = el.closest(".card")
-        let target = q(`.card-body`, p)
-        toggleClass(target, "d-none", !target.classList.contains("d-none"))
-    }
-})
-
 up.compiler("[got]", (_, data) => {
     const cursorName = "c"
     const { events, nodes, anscestors } = parseShallowJSON(data)
@@ -271,13 +263,13 @@ up.compiler("[got]", (_, data) => {
         q("#skip-till-end-action").onclick = skipTillEnd
         q("#prev-step-action").onclick = prevStep
         q("#next-step-action").onclick = nextStep
-        qa("button[node-id]").forEach(
-            (el) =>
-                (el.onclick = () => {
-                    scrollToElement(document.body, q(`#got-wrapper`))
-                    focusNode(el)
-                }),
-        )
+        // qa("button[node-id]").forEach(
+        //     (el) =>
+        //         (el.onclick = () => {
+        //             scrollToElement(document.body, q(`#got-wrapper`))
+        //             focusNode(el)
+        //         }),
+        // )
     }
 
     function keyboardEvent(e) {
