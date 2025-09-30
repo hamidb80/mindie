@@ -39,6 +39,7 @@ export function toTextRepr(node) {
 export function md2HtmlRaw(mdast) {
     const hast = hastUtils.toHast(mdast)
     const html = htmlUtils.toHtml(hast)
+    console.dir(hast, {depth: null})
     return html
 }
 

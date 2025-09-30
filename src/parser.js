@@ -247,11 +247,14 @@ export function parseGoT(parsedMd) {
             return {
                 id: c?.value,
                 kind: k === "think" ? "think" : "node",
+                class: k,
                 height: t?.value,
                 content: l.url,
-                parents: d?.children?.map(
-                    (lr) => findNode(lr, (n) => n.type == "inlineCode").value
-                ) ?? [],
+                parents:
+                    d?.children?.map(
+                        (lr) =>
+                            findNode(lr, (n) => n.type == "inlineCode").value
+                    ) ?? [],
             }
         })
     } else {

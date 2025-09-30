@@ -200,25 +200,36 @@ function rangeLen(indexes) {
 function toSVGImpl(got) {
     // extracts nessesary information for plotting
     const acc = []
-    got.grid.matrix.forEach((nodes, l) => {
-        nodes.forEach((n, i) => {
-            if (n) {
-                const idx = nodes
+    got.grid.matrix.forEach((row, l) => {
+        row.forEach((node, i) => {
+            if (node) {
+                const idx = row
                     .map((n, i) => (!!n ? i : undefined))
                     .filter((x) => x) // not Null Indexes
-                acc.push(positionedItem(n, l, i, keepEnds(idx), rangeLen(idx)))
+                acc.push(
+                    positionedItem(node, l, i, keepEnds(idx), rangeLen(idx))
+                )
             }
         })
     })
+
     return acc
 }
 
 function svgCalcPos(item, got, cfg, ctx) {
+    console.log(
+        cfg.pad.x,
+        cfg.space.x,
+        got.canvas.width,
+        item.col,
+        item.rowWidth
+    )
+
     const a =
-        cfg.padx +
+        cfg.pad.x +
         cfg.space.x *
             got.canvas.width *
-            ((1 / (1 + item.rowWidth)) * (1 + (item.col - item.rowWidth[0]))) +
+            ((1 / (1 + item.rowWidth)) * (1 + (item.col - item.rowRange[0]))) +
         -1 * ctx.cutx
     const b = cfg.pad.y + cfg.space.y * (got.canvas.height - item.row - 1)
 
@@ -283,10 +294,12 @@ export class GraphOfThought {
             locs[item.node] = pos
 
             console.log("_________ ", { pos })
+            console.log("++++++++++ ", this.nodes, item.node)
 
             children.push({
-                tag: "circle",
-                attrs: {
+                type: "element",
+                tagName: "circle",
+                properties: {
                     cx: pos[0],
                     cy: pos[1],
                     r: config.radius,
@@ -305,8 +318,9 @@ export class GraphOfThought {
             ...this.events
                 .filter((it) => it.kind == "message")
                 .map((me) => ({
-                    tag: "g",
-                    attrs: {
+                    type: "element",
+                    tagName: "g",
+                    properties: {
                         class: `message ${nodeClassName(me.id)}`,
                         "node-id": me.id,
                     },
@@ -345,8 +359,9 @@ export class GraphOfThought {
             const lvl = this.nodes[to].height
 
             children.push({
-                tag: "line",
-                attrs: {
+                type: "element",
+                tagName: "line",
+                properties: {
                     x1: h[0],
                     y1: h[1],
                     x2: t[0],
@@ -364,10 +379,11 @@ export class GraphOfThought {
         }
 
         return {
-            tag: "svg",
-            attrs: {
+            type: "element",
+            tagName: "svg",
+            properties: {
                 xmlns: "http://www.w3.org/2000/svg",
-                viewport: [0, 0, w, h],
+                viewport: [0, 0, w, h].join(" "),
             },
             children,
         }

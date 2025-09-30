@@ -5,6 +5,7 @@ import fg from "fast-glob"
 import { readPackage } from "read-pkg"
 import appRoot from "app-root-path"
 import i18n from "i18n"
+import * as htmlUtils from "hast-util-to-html"
 
 import { FileTree } from "../utils/filetree.js"
 import { noteType, parseGoT, parseMarkdown } from "../parser.js"
@@ -107,13 +108,16 @@ export async function compile(wdir, filetree, pathDispatcher, router, config) {
             if (nt == "got") {
                 const events = parseGoT(md)
                 let got = new GraphOfThought(events)
+                let svgObj = got.toSVG(config.styles)
+                console.dir(svgObj, { depth: null })
+
                 const html = await fromTemplate("got", {
                     got,
                     pinfo: ppin,
                     router,
                     dict,
                     config,
-                    svg: got.toSVG(config.styles),
+                    svg: htmlUtils.toHtml(svgObj),
                 })
                 fs.writeFileSync(outpath, html)
             } else if (nt == "md") {
