@@ -33,7 +33,7 @@ const router = (x) => {
         let pp = path.parse(fpaths[0])
         let newext = pp.ext == ".md" ? ".html" : pp.ext
         let newpath = path.join(pp.dir, pp.name + newext)
-        console.log(newpath)
+        // console.log(newpath)
         return "/" + newpath
     } else {
         throw "file not found: " + x

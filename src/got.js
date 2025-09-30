@@ -169,8 +169,8 @@ function allAnscestors(topoSortedNodeIds, nodesTable) {
 }
 /**
  *
- * @param {GoTEvent} events
- * @returns {GoTEdge[]}
+ * @param {Event} events
+ * @returns {Edge[]}
  */
 function extractEdges(events) {
     const acc = []
@@ -184,31 +184,19 @@ function extractEdges(events) {
     return acc
 }
 
+/**
+ * just to remember the structure
+ */
 function positionedItem(node, row, col, rowRange, rowWidth) {
     return { node, row, col, rowRange, rowWidth }
-}
-
-/**
- *
- * @param {*} item
- * @param {GraphOfThought} got
- * @param {*} cfg
- * @param {*} ctx
- * @returns
- */
-function svgCalcPos(item, got, cfg, ctx) {
-    const sh = got.shape()
-    const xcoeff =
-        (1 / (1 + item.rowWidth)) * (1 + (item.col - item.rowRange[0]))
-    const x = cfg.pad.x + cfg.space.x * sh.itemsPerRow * xcoeff + -1 * ctx.cutx
-    const y = cfg.pad.y + cfg.space.y * (sh.itemsPerCol - item.row - 1)
-
-    return [x, y]
 }
 
 export class GraphOfThought {
     maxHeight = 4
 
+    /**
+     * @param {Object[]} events 
+     */
     constructor(events) {
         this.events = events
         this.levels = buildLevels(events)
@@ -256,7 +244,7 @@ export class GraphOfThought {
 
         // === nodes =========================
         this.calcGridPlotData().forEach((item) => {
-            const pos = svgCalcPos(item, this, config, ctx)
+            const pos = this.svgCalcPos(item, config, ctx)
             const cls = this.nodes[item.node].class
             locs[item.node] = pos
 
@@ -380,5 +368,22 @@ export class GraphOfThought {
         })
 
         return acc
+    }
+
+    /**
+     * @param {PositionedItem} item 
+     * @param {Object} cfg 
+     * @param {Object} ctx 
+     * @returns position
+     */
+    svgCalcPos(item, cfg, ctx) {
+        const sh = this.shape()
+        const xcoeff =
+            (1 / (1 + item.rowWidth)) * (1 + (item.col - item.rowRange[0]))
+        const x =
+            cfg.pad.x + cfg.space.x * sh.itemsPerRow * xcoeff + -1 * ctx.cutx
+        const y = cfg.pad.y + cfg.space.y * (sh.itemsPerCol - item.row - 1)
+
+        return [x, y]
     }
 }
