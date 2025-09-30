@@ -9,7 +9,7 @@ import {
     mdastTagNode,
     mdastTextNode,
 } from "./utils/mdast.js"
-import { parseYamlAsJson } from "./utils/conventions.js"
+import { parseYamlAsJson } from "./utils/yaml.js"
 import { pop, rev } from "./utils/array.js"
 
 // ------------------------------------------------------

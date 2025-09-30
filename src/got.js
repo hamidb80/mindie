@@ -73,8 +73,6 @@ function rangeLen(indexes) {
 
 // ----------------------------------------------------
 
-const nodeClassName = (id) => `node-${id}`
-
 /**
  * @param {any[][]} rows - 2D array of elements
  * @returns the bounding box of the sparse matrix
@@ -152,6 +150,11 @@ function fillGrid(events, levels) {
     return grid
 }
 
+/**
+ * @param {string[]} topoSortedNodeIds
+ * @param {Object} nodesTable - `node_id -> data`
+ * @returns `node_id -> node_id[]`
+ */
 function allAnscestors(topoSortedNodeIds, nodesTable) {
     const anscestorTable = {}
 
@@ -164,7 +167,11 @@ function allAnscestors(topoSortedNodeIds, nodesTable) {
     }
     return anscestorTable
 }
-
+/**
+ *
+ * @param {GoTEvent} events
+ * @returns {GoTEdge[]}
+ */
 function extractEdges(events) {
     const acc = []
     for (const e of events) {
@@ -179,30 +186,6 @@ function extractEdges(events) {
 
 function positionedItem(node, row, col, rowRange, rowWidth) {
     return { node, row, col, rowRange, rowWidth }
-}
-
-/**
- * @summary extracts nessesary information for plotting
- * @param {GraphOfThought} got
- * @returns {Object[][]}
- */
-function toSVGImpl(got) {
-    const acc = []
-    got.grid.matrix.forEach((nodes, row) => {
-        nodes.forEach((node, col) => {
-            if (node) {
-                const idx = nodes
-                    .map((n, i) => (!!n ? i : null))
-                    .filter((x) => x !== null)
-
-                acc.push(
-                    positionedItem(node, row, col, keepEnds(idx), rangeLen(idx))
-                )
-            }
-        })
-    })
-
-    return acc
 }
 
 /**
@@ -242,7 +225,7 @@ export class GraphOfThought {
     }
 
     /**
-     * @summary returns the shape of the grid, i.e. items per row and items per column
+     * @summary returns the shape of the grid i.e. dimention
      */
     shape() {
         return {
@@ -267,10 +250,12 @@ export class GraphOfThought {
         let children = []
         let locs = {}
 
+        const nodeClassName = (id) => `node-${id}`
+
         // ------------------------------------------------------------------
 
         // === nodes =========================
-        toSVGImpl(this).forEach((item) => {
+        this.calcGridPlotData().forEach((item) => {
             const pos = svgCalcPos(item, this, config, ctx)
             const cls = this.nodes[item.node].class
             locs[item.node] = pos
@@ -364,5 +349,36 @@ export class GraphOfThought {
             },
             children,
         }
+    }
+
+    // -----------------------------------------
+
+    /**
+     * @summary extracts nessesary information for plotting
+     * @returns {PositionedItem[][]}
+     */
+    calcGridPlotData() {
+        const acc = []
+        this.grid.matrix.forEach((nodes, row) => {
+            nodes.forEach((node, col) => {
+                if (node) {
+                    const idx = nodes
+                        .map((n, i) => (!!n ? i : null))
+                        .filter((x) => x !== null)
+
+                    acc.push(
+                        positionedItem(
+                            node,
+                            row,
+                            col,
+                            keepEnds(idx),
+                            rangeLen(idx)
+                        )
+                    )
+                }
+            })
+        })
+
+        return acc
     }
 }
