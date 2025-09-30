@@ -12,10 +12,11 @@ a[up-follow]:hover {
   font-weight: 400;
 }
 
-figure img {
+figure img, img {
   max-width: 100%;
   object-fit: contain;
 }
+
 
 pre {
   line-height: 0.9;

@@ -1,12 +1,18 @@
 import * as path from "path"
 import fs from "fs"
 
+import fg from "fast-glob"
+import { readPackage } from "read-pkg"
+import appRoot from "app-root-path"
+
 import { FileTree } from "../utils/filetree.js"
 import { noteType, parseGoT, parseMarkdown } from "../parser.js"
 import { fromTemplate, md2HtmlRaw } from "../render.js"
 // import { digestWorkspace } from "../engine.js"
 
 // ----------------------------------------------
+
+const pkg = await readPackage()
 
 /**
  * @summary iterate through files -> maybe compile -> write
@@ -21,13 +27,11 @@ export async function compile(wdir, filetree, pathDispatcher, router) {
         const ppout = path.parse(outpath)
         const nt = noteType(relpath)
 
-        // TODO use async version
-
-        fs.mkdirSync(ppout.dir, { recursive: true })
+        await fs.promises.mkdir(ppout.dir, { recursive: true })
 
         if (nt == "other") {
             console.log(`[COPY] ${inpath} -> ${outpath}`)
-            fs.copyFileSync(inpath, outpath)
+            await fs.promises.copyFile(inpath, outpath)
         } else {
             const content = fs.readFileSync(inpath, "utf-8")
             const md = parseMarkdown(content, relpath, router)
@@ -55,4 +59,21 @@ export async function compile(wdir, filetree, pathDispatcher, router) {
         }
     }
     console.log(`[DONE] compiling`)
+    // --------------------------------------
+
+    let cwd = path.join(appRoot.path, "src/app/browser/")
+    let siteFiles = fg.globSync("*", { cwd })
+
+    console.log(`[site files]`, siteFiles)
+
+    for (const sf of siteFiles) {
+        await fs.promises.cp(
+            path.join(cwd, sf),
+            path.join(appRoot.path, "temp", "public", sf),
+            {
+                recursive: true,
+                force: true,
+            }
+        )
+    }
 }
