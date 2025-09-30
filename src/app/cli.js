@@ -108,6 +108,7 @@ export async function compile(wdir, filetree, pathDispatcher, router, config) {
             console.log(`[PROC] ${inpath} -> ${outpath}`)
             if (nt == "got") {
                 const events = parseGoT(md)
+
                 let got = new GraphOfThought(events)
                 let svgObj = got.toSVG(config.styles)
 

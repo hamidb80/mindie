@@ -248,7 +248,7 @@ export function parseGoT(parsedMd) {
                 id: c?.value,
                 kind: k === "think" ? "message" : "node",
                 class: k,
-                height: t?.value,
+                height: t ? +t.value : undefined,
                 content: l.url,
                 parents:
                     d?.children?.map(

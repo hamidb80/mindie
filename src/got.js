@@ -236,8 +236,9 @@ const dup = (val, times) => new Array(times).fill(val)
 
 function chopInto(len, slices, max) {
     const m = max - slices + 1
-    const a = [m, dup([1, m], slices - 1)].flat()
-    return vmul(len / sum(a), a)
+    const a = [m, ...dup([1, m], slices - 1)].flat()
+    const res = vmul(len / sum(a), a)
+    return res
 }
 
 export class GraphOfThought {
