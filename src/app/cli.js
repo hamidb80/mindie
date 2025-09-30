@@ -71,11 +71,12 @@ export async function compile(wdir, filetree, pathDispatcher, router, config) {
         app: { title: "Konkur Computer", root: "home" },
         styles: {
             radius: 16,
-            space: { x: 100, y: 80 },
-            pad: { x: 40, y: 40 },
-            stroke: 4,
-            node_pad: 6,
-            stroke_color: "#424242",
+            space: { x: 120, y: 80 },
+            pad: { x: 40, y: 20, node: 6 },
+            stroke: {
+                width: 4,
+                color: "#424242",
+            },
             color_map: {
                 problem: "#545454",
                 quite: "transparent",
@@ -109,7 +110,6 @@ export async function compile(wdir, filetree, pathDispatcher, router, config) {
                 const events = parseGoT(md)
                 let got = new GraphOfThought(events)
                 let svgObj = got.toSVG(config.styles)
-                console.dir(svgObj, { depth: null })
 
                 const html = await fromTemplate("got", {
                     got,
@@ -140,7 +140,7 @@ export async function compile(wdir, filetree, pathDispatcher, router, config) {
     let cwd = path.join(appRoot.path, "src/app/browser/")
     let siteFiles = fg.globSync("*", { cwd })
 
-    console.log(`[site files]`, siteFiles)
+    console.log(`[COPY] assets`, siteFiles)
 
     for (const sf of siteFiles) {
         await fs.promises.cp(

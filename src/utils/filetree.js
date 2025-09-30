@@ -19,7 +19,6 @@ export class FileTree {
     constructor(dir, fileFormats = COMMON_FILE_EXTS) {
         const formats = fileFormats.join(",")
         const pattern = `${dir}**/*{${formats}}`
-        console.log(pattern)
         const filePaths = fg
             .globSync(pattern)
             .map((p) => "./" + path.relative(dir, p))

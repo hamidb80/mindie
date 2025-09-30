@@ -73,7 +73,6 @@ class Grid {
 // ----------------------------------------------------
 
 function boundingBox(rows) {
-    console.log("[boundingBox]", rows)
     return {
         w: Math.max(0, ...rows.map((r) => r.length)),
         h: rows.length,
@@ -83,7 +82,6 @@ function boundingBox(rows) {
 function buildLevels(events) {
     const levels = {}
 
-    console.log("events", events)
     for (const e of events) {
         if (e.kind == "node") {
             levels[e.id] = 1 + Math.max(-1, ...e.parents.map((p) => levels[p]))
@@ -93,11 +91,18 @@ function buildLevels(events) {
     return levels
 }
 
+/**
+ *
+ * @param {Grid} grid
+ * @param {*} bbox
+ * @param {*} levels
+ * @param {*} node
+ * @param {*} selectedRow
+ * @param {*} parents
+ */
 function placeNode(grid, bbox, levels, node, selectedRow, parents) {
-    console.log("placeNode", { grid, bbox, levels, node, selectedRow, parents })
-
     const { w } = bbox
-    const pcols = parents.map((p) => grid.findCol(levels[p], p))
+    const pcols = parents.map((p) => grid.findCol(levels[p], p)) // placed columns ???
     const c = Math.min(w - 1, Math.ceil(w / 2)) // center
     const wc = avg(pcols, c) // weighted center (avg of parents col)
 
@@ -108,11 +113,11 @@ function placeNode(grid, bbox, levels, node, selectedRow, parents) {
         const left = Math.max(0, i)
         const right = Math.min(w - 1, j)
 
-        if (grid.getCell(selectedRow, left) == null) {
-            grid.setCell(selectedRow, left, node)
+        if (grid.getCell(left, selectedRow) == null) {
+            grid.setCell(left, selectedRow, node)
             break
-        } else if (grid.getCell(selectedRow, right) == null) {
-            grid.setCell(selectedRow, right, node)
+        } else if (grid.getCell(right, selectedRow) == null) {
+            grid.setCell(right, selectedRow, node)
             break
         } else {
             --i
@@ -141,12 +146,6 @@ function fillGrid(events, levels) {
     const rows = revTable(levels)
     const bbox = boundingBox(rows)
     const { w, h } = bbox
-
-    console.log("events", events)
-    console.log("levels", levels)
-    console.log("rows", rows)
-    console.log("bbox", bbox)
-
     const grid = new Grid(w, h, null)
 
     for (const e of events) {
@@ -154,6 +153,7 @@ function fillGrid(events, levels) {
             placeNode(grid, bbox, levels, e.id, levels[e.id], e.parents)
         }
     }
+
     return grid
 }
 
@@ -175,7 +175,7 @@ function extractEdges(events) {
     for (const e of events) {
         if (e.kind == "node") {
             for (const p of e.parents) {
-                acc.push([e.id, p])
+                acc.push({ from: p, to: e.id })
             }
         }
     }
@@ -197,17 +197,22 @@ function rangeLen(indexes) {
     return indexes.at(-1) - indexes.at(0) + 1
 }
 
+/**
+ * @summary extracts nessesary information for plotting
+ * @param {GraphOfThought} got
+ * @returns {Object[][]}
+ */
 function toSVGImpl(got) {
-    // extracts nessesary information for plotting
     const acc = []
-    got.grid.matrix.forEach((row, l) => {
-        row.forEach((node, i) => {
+    got.grid.matrix.forEach((nodes, row) => {
+        nodes.forEach((node, col) => {
             if (node) {
-                const idx = row
-                    .map((n, i) => (!!n ? i : undefined))
-                    .filter((x) => x) // not Null Indexes
+                const idx = nodes
+                    .map((n, i) => (!!n ? i : null))
+                    .filter((x) => x !== null)
+
                 acc.push(
-                    positionedItem(node, l, i, keepEnds(idx), rangeLen(idx))
+                    positionedItem(node, row, col, keepEnds(idx), rangeLen(idx))
                 )
             }
         })
@@ -217,23 +222,14 @@ function toSVGImpl(got) {
 }
 
 function svgCalcPos(item, got, cfg, ctx) {
-    console.log(
-        cfg.pad.x,
-        cfg.space.x,
-        got.canvas.width,
-        item.col,
-        item.rowWidth
-    )
+    const xcoeff =
+        (1 / (1 + item.rowWidth)) * (1 + (item.col - item.rowRange[0]))
 
-    const a =
-        cfg.pad.x +
-        cfg.space.x *
-            got.canvas.width *
-            ((1 / (1 + item.rowWidth)) * (1 + (item.col - item.rowRange[0]))) +
-        -1 * ctx.cutx
-    const b = cfg.pad.y + cfg.space.y * (got.canvas.height - item.row - 1)
+    const x =
+        cfg.pad.x + cfg.space.x * got.canvas.width * xcoeff + -1 * ctx.cutx
+    const y = cfg.pad.y + cfg.space.y * (got.canvas.height - item.row - 1)
 
-    return [a, b]
+    return [x, y]
 }
 
 const dup = (val, times) => new Array(times).fill(val)
@@ -293,9 +289,6 @@ export class GraphOfThought {
             const pos = svgCalcPos(item, this, config, ctx)
             locs[item.node] = pos
 
-            console.log("_________ ", { pos })
-            console.log("++++++++++ ", this.nodes, item.node)
-
             children.push({
                 type: "element",
                 tagName: "circle",
@@ -324,35 +317,32 @@ export class GraphOfThought {
                         class: `message ${nodeClassName(me.id)}`,
                         "node-id": me.id,
                     },
-                    children: me.parents.map((n) => ({
-                        type: "circle",
-                        attrs: {
-                            cx: first(locs[n]),
-                            cy: last(locs[n]),
-                            r: config.radius + config.stroke * 2,
-                            fill: config.colorMap.thoughts,
+                    children: me.parents.map((p) => ({
+                        type: "element",
+                        tagName: "circle",
+                        properties: {
+                            cx: locs[p][0],
+                            cy: locs[p][1],
+                            r: config.radius + config.stroke.width * 2,
+                            opacity: 0.5,
+                            fill: config.color_map.thoughts,
                             role: "button",
                             type: "message",
-                            stroke: config.strokeColor,
-                            "stroke-width": config.stroke,
+                            stroke: config.stroke.color,
+                            "stroke-width": config.stroke.width,
                             "stroke-dasharray": "10,12",
                         },
                     })),
                 }))
         )
 
-        console.log("edges", this.edges)
         for (const e of this.edges) {
-            console.log("locs", locs)
-            console.log("e", e)
-
-            const from = e[0]
-            const to = e[1]
+            const { from, to } = e
             const head = locs[from]
             const tail = locs[to]
             const vec = vsub(tail, head)
             const nv = vnorm(vec)
-            const diff = vmul(config.node_pad + config.radius, nv)
+            const diff = vmul(config.pad.node + config.radius, nv)
             const h = vadd(head, diff)
             const t = vsub(tail, diff)
             const len = vmag(vsub(h, t))
@@ -366,8 +356,8 @@ export class GraphOfThought {
                     y1: h[1],
                     x2: t[0],
                     y2: t[1],
-                    "stroke-width": config.stroke,
-                    stroke: config.strokeColor,
+                    "stroke-width": config.stroke.width,
+                    stroke: config.stroke.color,
                     "stroke-dasharray": chopInto(len, lvl, this.maxHeight).join(
                         " "
                     ),
