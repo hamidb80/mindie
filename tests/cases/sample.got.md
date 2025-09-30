@@ -5,4 +5,8 @@
 	- `root`
 4. ==recall== `wtf-1` #1 [[ref]]
 	- `root`
+5. ==calculate== `wtf-2` #3 [[ref]]
+	- `root`
+6. ==goal== `wtf-3` #1 [[ref]]
+	- `wtf-1`
 

@@ -72,7 +72,7 @@ export async function compile(wdir, filetree, pathDispatcher, router, config) {
         styles: {
             radius: 16,
             space: { x: 120, y: 80 },
-            pad: { x: 40, y: 20, node: 6 },
+            pad: { x: 40, y: 40, node: 6 },
             stroke: {
                 width: 4,
                 color: "#424242",

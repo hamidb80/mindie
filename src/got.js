@@ -195,7 +195,7 @@ export class GraphOfThought {
     maxHeight = 4
 
     /**
-     * @param {Object[]} events 
+     * @param {Object[]} events
      */
     constructor(events) {
         this.events = events
@@ -232,7 +232,7 @@ export class GraphOfThought {
         const sh = this.shape()
         const cutx = (sh.itemsPerRow * config.space.x) / (sh.itemsPerRow + 1)
         const w = 2 * config.pad.x + sh.itemsPerRow * config.space.x - 2 * cutx
-        const h = config.pad.y * 2 + (sh.itemsPerCol - 1) * config.space.y - 0
+        const h = 2 * config.pad.y + (sh.itemsPerCol - 1) * config.space.y - 0
 
         const ctx = { cutx }
         let children = []
@@ -334,6 +334,8 @@ export class GraphOfThought {
             properties: {
                 xmlns: "http://www.w3.org/2000/svg",
                 viewport: [0, 0, w, h].join(" "),
+                width: `${w}px`,
+                height: `${h}px`,
             },
             children,
         }
@@ -371,9 +373,9 @@ export class GraphOfThought {
     }
 
     /**
-     * @param {PositionedItem} item 
-     * @param {Object} cfg 
-     * @param {Object} ctx 
+     * @param {PositionedItem} item
+     * @param {Object} cfg
+     * @param {Object} ctx
      * @returns position
      */
     svgCalcPos(item, cfg, ctx) {
