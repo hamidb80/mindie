@@ -22,8 +22,6 @@ const newpath = (relpath) => {
 }
 // TODO add file dispatcher
 const router = (x) => {
-    console.log("------------------->?????????????????????????????")
-
     let f1 = filetree.findFiles("/" + x)
     let f2 = filetree.findFiles("/" + x + ".md")
     let fpaths = f1.length ? f1 : f2

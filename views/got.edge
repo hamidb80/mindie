@@ -52,29 +52,28 @@
     </div>
 
     <article class="my-3">
-      (map- (got :events)
-      (fn [e]
-      (let [key (e :content)
-      c (e :class)
-      article (assert (db key) (string "invalid reference: " key))
-      t (or c :thoughts)
-      summ ((t))
-      icon ({:problem bi bi-question-circle
-      :goal bi bi-bullseye
-      :reason bi bi-lightbulb
-      :recall bi bi-floppy
-      :calculate bi bi-calculator
-      :thoughts bi bi-chat
-      } t)
-      color ((svg-theme :color-map) t)
-      has-link (not (article :private))]
-      [
+      @each(e in got.events)
+      @let(key = e.content)
+      @let(c = e.class)
+      @let(t = c || 'thoughts')
+      @let(article = db[key])
+      @let(summ = dict(t))
+      @let(icon = {
+      problem: "bi bi-question-circle",
+      goal: "bi bi-bullseye",
+      reason: "bi bi-lightbulb",
+      recall: "bi bi-floppy",
+      calculate: "bi bi-calculator",
+      thoughts: "bi bi-chat",
+      }[t])
+      @let(color = config.styles.color_map[t])
+      @let(has_link = !article.private)
       <div class="pb-3 content" content="{{key}}" for="{{e.id}}">
         <div class="card">
           <div class="card-header d-flex justify-content-between px-2">
             <div class="text-truncate">
               @if(has_link)
-              <a class="text-muted" up-follow href="(router key :html)">
+              <a class="text-muted" up-follow href="{{router(key)}}">
                 <i class="bi bi-hash"></i>
                 {{key}}
               </a>
@@ -117,6 +116,8 @@
 
         </div>
       </div>
+      @end
+
     </article>
 
     <div class="d-lg-none" style="height: 40px"></div>

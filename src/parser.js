@@ -242,14 +242,16 @@ export function parseGoT(parsedMd) {
             const t = findNode(p, (n) => n.type == "tag")
             const l = findNode(p, (n) => n.type == "link")
             const d = findNode(li, (n) => n.type == "list")
+
+            let k = h.children[0].value
             return {
                 id: c?.value,
-                kind: h.children[0].value,
+                kind: k === "think" ? "think" : "node",
                 height: t?.value,
                 content: l.url,
                 parents: d?.children?.map(
                     (lr) => findNode(lr, (n) => n.type == "inlineCode").value
-                ),
+                ) ?? [],
             }
         })
     } else {

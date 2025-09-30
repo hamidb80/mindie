@@ -9,6 +9,7 @@ import i18n from "i18n"
 import { FileTree } from "../utils/filetree.js"
 import { noteType, parseGoT, parseMarkdown } from "../parser.js"
 import { fromTemplate, md2HtmlRaw } from "../render.js"
+import { GraphOfThought } from "../got.js"
 // import { digestWorkspace } from "../engine.js"
 
 // ----------------------------------------------
@@ -29,12 +30,63 @@ function dict(key, locale = "en", args = {}) {
 
 const pkg = await readPackage()
 
+/*
+(defn load-deep (root)
+  "
+  find all markup/GoT files in the `dir` and load them.
+  "
+  (let [acc @{}
+        root-dir (path/dir root)]
+    
+    (each p (os/list-files-rec root-dir)
+      (let [pparts    (path/split p)
+            kind (cond 
+                  (string/has-suffix? markup-ext p) :note
+                  (string/has-suffix?    got-ext p) :got
+                  nil)]
+        (if kind 
+          (put acc 
+            (keyword (string/remove-prefix root-dir (pparts :dir)) (pparts :name)) 
+            @{:path    p
+              :kind    kind
+              :private (string/has-suffix? private-suffix (pparts :name))
+              :meta    @{} # attributes that are computed after initial preprocessing
+              :content (let [file-content (try (slurp p)            ([e] (error (string "error while reading from file: "                       p "\n >>> " e))))
+                             lisp-code    (try (parse file-content) ([e] (error (string "error while parseing lisp code from file: "            p "\n >>> " e))))
+                             result       (try (eval  lisp-code)    ([e] (error (string "error while evaluating parseing lisp code from file: " p "\n >>> " e))))]
+                          result)}))))
+    acc))
+*/
+
+// TODO convert load-deep to make `article` available in the got template
+
 /**
  * @summary iterate through files -> maybe compile -> write
  * @param {FileTree} filetree
  * @param {string -> string} pathDispatcher
  */
-export async function compile(wdir, filetree, pathDispatcher, router) {
+export async function compile(wdir, filetree, pathDispatcher, router, config) {
+    config = {
+        app: { title: "Konkur Computer", root: "home" },
+        styles: {
+            radius: 16,
+            space: { x: 100, y: 80 },
+            pad: { x: 40, y: 40 },
+            stroke: 4,
+            node_pad: 6,
+            stroke_color: "#424242",
+            color_map: {
+                problem: "#545454",
+                quite: "transparent",
+                goal: "#545454",
+                recall: "#864AF9",
+                calculate: "#E85C0D",
+                reason: "#5CB338",
+                thoughts: "#ffef00",
+            },
+        },
+    }
+
     for (const relpath of filetree.allFiles()) {
         const inpath = path.join(wdir, relpath)
         const outpath = pathDispatcher(relpath)
@@ -53,12 +105,15 @@ export async function compile(wdir, filetree, pathDispatcher, router) {
 
             console.log(`[PROC] ${inpath} -> ${outpath}`)
             if (nt == "got") {
-                const got = parseGoT(md)
+                const events = parseGoT(md)
+                let got = new GraphOfThought(events)
                 const html = await fromTemplate("got", {
                     got,
                     pinfo: ppin,
                     router,
                     dict,
+                    config,
+                    svg: got.toSVG(config.styles),
                 })
                 fs.writeFileSync(outpath, html)
             } else if (nt == "md") {
