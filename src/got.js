@@ -1,42 +1,5 @@
 import { vadd, vsub, vsum, vmag, vmul, vnorm } from "./utils/vector.js"
 
-// XXX use ast packages (like mdast for markdown) to convert to SVG (which is XML)
-
-// public interface ------------------------
-
-const MAX_HEIGHT = 4
-
-//  types: :problem :goal :recall :reason :calculate :quite
-
-// (defn n [id height class parents content] # [n]ode
-//   {:kind     :node
-//    :id       id
-//    :height   (do (assert (<= 1 height max-height) (string "the height of a node must be in range of 1.." max-height))
-//                  height)
-//    :class    class
-//    :parents  parents
-//    :content  content})
-
-// (defn q [id nodes content] # [m]essge, question or hint
-//   {:kind    :message
-//    :id      id
-//    :nodes   nodes
-//    :content content})
-
-// [
-//   (n :root       1 :problem []      :index)
-//   (m :wtf                         :child)
-//   (n :sigma      1 :recall  [:root] :index)
-//   (n :project    1 :recall  [:root] :child)
-//   (n :div        1 :recall  [:root] :index)
-//   (n :op-1-final 1 :reason  [:div :project :sigma] :index)
-//   (n :join       1 :recall  [:root]                :child)
-//   (n :op-2-final 1 :reason  [:join :project :sigma] :index)
-//   (n :op-3-final 1 :reason  [:join :project :sigma] :index)
-//   (n :op-4-final 1 :reason  [:join :project :sigma] :index)
-//   (n :goal       1 :goal  [:op-4-final] :child)
-// ]
-
 // utils -------------------------------------------
 
 function identity(x) {
@@ -55,6 +18,27 @@ function create2DArray(rows, cols, initialValue = 0) {
     return Array.from({ length: rows }, () => Array(cols).fill(initialValue))
 }
 
+/**
+ * @summary reverses the table from `key -> value` to `value -> key[]`
+ * @param {Object} object
+ * @returns {Object}
+ */
+function revTable(object) {
+    let result = []
+
+    for (const key in object) {
+        let val = object[key]
+
+        if (!result[val]) {
+            result[val] = []
+        }
+
+        result[val].push(key)
+    }
+
+    return result
+}
+
 class Grid {
     constructor(w, h, init) {
         this.matrix = create2DArray(h, w, init)
@@ -70,8 +54,31 @@ class Grid {
     }
 }
 
+const dup = (val, times) => new Array(times).fill(val)
+
+function chopInto(len, slices, max) {
+    const m = max - slices + 1
+    const a = [m, ...dup([1, m], slices - 1)].flat()
+    const res = vmul(len / sum(a), a)
+    return res
+}
+
+function keepEnds(lst) {
+    return [lst.at(0), lst.at(-1)]
+}
+
+function rangeLen(indexes) {
+    return indexes.at(-1) - indexes.at(0) + 1
+}
+
 // ----------------------------------------------------
 
+const nodeClassName = (id) => `node-${id}`
+
+/**
+ * @param {any[][]} rows - 2D array of elements
+ * @returns the bounding box of the sparse matrix
+ */
 function boundingBox(rows) {
     return {
         w: Math.max(0, ...rows.map((r) => r.length)),
@@ -79,6 +86,10 @@ function boundingBox(rows) {
     }
 }
 
+/**
+ * @param {Object[]} events
+ * @returns `node-id -> level`
+ */
 function buildLevels(events) {
     const levels = {}
 
@@ -126,22 +137,6 @@ function placeNode(grid, bbox, levels, node, selectedRow, parents) {
     }
 }
 
-function revTable(object) {
-    let result = []
-
-    for (const key in object) {
-        let val = object[key]
-
-        if (!result[val]) {
-            result[val] = []
-        }
-
-        result[val].push(key)
-    }
-
-    return result
-}
-
 function fillGrid(events, levels) {
     const rows = revTable(levels)
     const bbox = boundingBox(rows)
@@ -182,19 +177,8 @@ function extractEdges(events) {
     return acc
 }
 
-function nodeClassName(id) {
-    return `node-${id}`
-}
-
 function positionedItem(node, row, col, rowRange, rowWidth) {
     return { node, row, col, rowRange, rowWidth }
-}
-
-function keepEnds(lst) {
-    return [lst.at(0), lst.at(-1)]
-}
-function rangeLen(indexes) {
-    return indexes.at(-1) - indexes.at(0) + 1
 }
 
 /**
@@ -221,27 +205,27 @@ function toSVGImpl(got) {
     return acc
 }
 
+/**
+ *
+ * @param {*} item
+ * @param {GraphOfThought} got
+ * @param {*} cfg
+ * @param {*} ctx
+ * @returns
+ */
 function svgCalcPos(item, got, cfg, ctx) {
+    const sh = got.shape()
     const xcoeff =
         (1 / (1 + item.rowWidth)) * (1 + (item.col - item.rowRange[0]))
-
-    const x =
-        cfg.pad.x + cfg.space.x * got.canvas.width * xcoeff + -1 * ctx.cutx
-    const y = cfg.pad.y + cfg.space.y * (got.canvas.height - item.row - 1)
+    const x = cfg.pad.x + cfg.space.x * sh.itemsPerRow * xcoeff + -1 * ctx.cutx
+    const y = cfg.pad.y + cfg.space.y * (sh.itemsPerCol - item.row - 1)
 
     return [x, y]
 }
 
-const dup = (val, times) => new Array(times).fill(val)
-
-function chopInto(len, slices, max) {
-    const m = max - slices + 1
-    const a = [m, ...dup([1, m], slices - 1)].flat()
-    const res = vmul(len / sum(a), a)
-    return res
-}
-
 export class GraphOfThought {
+    maxHeight = 4
+
     constructor(events) {
         this.events = events
         this.levels = buildLevels(events)
@@ -255,14 +239,16 @@ export class GraphOfThought {
             this.nodes
         )
         this.edges = extractEdges(events)
+    }
 
-        this.nodes_height_range = [1, 4]
-        this.canvas = {
-            width: this.grid.matrix.at(0).length,
-            height: this.grid.matrix.length,
+    /**
+     * @summary returns the shape of the grid, i.e. items per row and items per column
+     */
+    shape() {
+        return {
+            itemsPerRow: this.grid.matrix.at(0).length,
+            itemsPerCol: this.grid.matrix.length,
         }
-
-        this.maxHeight = MAX_HEIGHT
     }
 
     /**
@@ -272,22 +258,21 @@ export class GraphOfThought {
      * @returns {Object}
      */
     toSVG(config) {
-        const cutx =
-            (this.canvas.width * config.space.x) / (this.canvas.width + 1)
+        const sh = this.shape()
+        const cutx = (sh.itemsPerRow * config.space.x) / (sh.itemsPerRow + 1)
+        const w = 2 * config.pad.x + sh.itemsPerRow * config.space.x - 2 * cutx
+        const h = config.pad.y * 2 + (sh.itemsPerCol - 1) * config.space.y - 0
 
-        const w =
-            2 * config.pad.x +
-            (0 + this.canvas.width) * config.space.x -
-            2 * cutx
-        const h =
-            config.pad.y * 2 + (this.canvas.height - 1) * config.space.y - 0
-
-        const children = []
-        const locs = {}
         const ctx = { cutx }
+        let children = []
+        let locs = {}
 
-        for (const item of toSVGImpl(this)) {
+        // ------------------------------------------------------------------
+
+        // === nodes =========================
+        toSVGImpl(this).forEach((item) => {
             const pos = svgCalcPos(item, this, config, ctx)
+            const cls = this.nodes[item.node].class
             locs[item.node] = pos
 
             children.push({
@@ -297,17 +282,16 @@ export class GraphOfThought {
                     cx: pos[0],
                     cy: pos[1],
                     r: config.radius,
-                    fill: config.color_map[this.nodes[item.node].class],
+                    fill: config.color_map[cls],
                     role: "button",
                     "node-id": item.node,
                     type: "node",
-                    class: `node node-class-${
-                        this.nodes[item.node].class
-                    } ${nodeClassName(item.node)}`,
+                    class: `node node-class-${cls} ${nodeClassName(item.node)}`,
                 },
             })
-        }
+        })
 
+        // === thoughts =========================
         children.push(
             ...this.events
                 .filter((it) => it.kind == "message")
@@ -337,7 +321,8 @@ export class GraphOfThought {
                 }))
         )
 
-        for (const e of this.edges) {
+        // === edges =========================
+        this.edges.forEach((e) => {
             const { from, to } = e
             const head = locs[from]
             const tail = locs[to]
@@ -367,8 +352,9 @@ export class GraphOfThought {
                     class: `edge ${nodeClassName(to)}`,
                 },
             })
-        }
+        })
 
+        // === wrap =========================
         return {
             type: "element",
             tagName: "svg",

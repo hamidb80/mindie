@@ -1,3 +1,9 @@
+// class Vector {
+//     constructor(...values){
+//         this.internal = values
+//     }
+// }
+
 export function vsum(v) {
     return v.reduce((acc, v) => acc + v, 0)
 }
