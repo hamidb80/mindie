@@ -4,17 +4,9 @@ import appRoot from "app-root-path"
 
 import { compile } from "../src/app/cli.js"
 import { FileTree } from "../src/utils/filetree.js"
+import { changeExt } from "../src/utils/path.js"
 
 // -------------------------------------------------------
-/**
- * @param {string} fpath - file path
- * @param {string} to - new extension like `.html`
- * @returns {string} - the file path with extension subtitued
- */
-function changeExt(fpath, to) {
-    const pi = path.parse(fpath)
-    return path.join(pi.dir, pi.name + to)
-}
 
 /**
  *
@@ -26,7 +18,6 @@ const newpath = (relpath) => {
     const temp = relpath.endsWith(".md") ? changeExt(relpath, ".html") : relpath
     return path.join(OUT_DIR, temp)
 }
-// -------------------------------------------------------
 
 // const wdir = "/home/ditroid/Documents/network-security/"
 const wdir = path.join(appRoot.path, "tests", "cases")
