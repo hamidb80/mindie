@@ -3,10 +3,10 @@
 	- `root`
 3. ==reason== `start-to-understand-problem` #2 [[ref]]
 	- `root`
-4. ==recall== `wtf-1` #1 [[ref]]
+4. ==calculate== `wtf-1` #3 [[ref]]
 	- `root`
-5. ==calculate== `wtf-2` #3 [[ref]]
-	- `root`
-6. ==goal== `wtf-3` #1 [[ref]]
+5. ==recall== `wtf-2` #1 [[ref]]`
 	- `wtf-1`
+6. ==goal== `wtf-3` #1 [[ref]]
+	- `wtf-2`
 
