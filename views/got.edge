@@ -67,12 +67,11 @@
       thoughts: "bi bi-chat",
       }[t])
       @let(color = config.styles.color_map[t])
-      @let(has_link = !article.private)
       <div class="pb-3 content" content="{{key}}" for="{{e.id}}">
         <div class="card">
           <div class="card-header d-flex justify-content-between px-2">
             <div class="text-truncate">
-              @if(has_link)
+              @if(!article.private)
               <a class="text-muted" up-follow href="{{router(key)}}">
                 <i class="bi bi-hash"></i>
                 {{key}}
