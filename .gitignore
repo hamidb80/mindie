@@ -9,4 +9,5 @@ play/
 .env
 play.*
 
-.tangent
+**/.tangent/
+**/.tangentfolder

@@ -61,34 +61,43 @@ const pkg = await readPackage()
 
 // TODO convert load-deep to make `article` available in the got template
 
+const DEFAULT_GOT_CONFIG = {
+    app: { title: "Title", root: "home" },
+    styles: {
+        radius: 16,
+        space: { x: 120, y: 80 },
+        pad: { x: 40, y: 40, node: 6 },
+        stroke: {
+            width: 4,
+            color: "#424242",
+        },
+        color_map: {
+            problem: "#545454",
+            quite: "transparent",
+            goal: "#545454",
+            recall: "#864AF9",
+            calculate: "#E85C0D",
+            reason: "#5CB338",
+            thought: "#ffef00",
+        },
+    },
+}
+
 /**
  * @summary iterate through files -> maybe compile -> write
+ * @param {string} wdir - working directory
  * @param {FileTree} filetree
  * @param {string -> string} pathDispatcher
+ * @param {string -> string} router 
+ * 
  */
-export async function compile(wdir, filetree, pathDispatcher, router, config) {
-    config = {
-        app: { title: "Konkur Computer", root: "home" },
-        styles: {
-            radius: 16,
-            space: { x: 120, y: 80 },
-            pad: { x: 40, y: 40, node: 6 },
-            stroke: {
-                width: 4,
-                color: "#424242",
-            },
-            color_map: {
-                problem: "#545454",
-                quite: "transparent",
-                goal: "#545454",
-                recall: "#864AF9",
-                calculate: "#E85C0D",
-                reason: "#5CB338",
-                thought: "#ffef00",
-            },
-        },
-    }
-
+export async function compile(
+    wdir,
+    filetree,
+    pathDispatcher,
+    router,
+    config = DEFAULT_GOT_CONFIG
+) {
     for (const relpath of filetree.allFiles()) {
         const inpath = path.join(wdir, relpath)
         const outpath = pathDispatcher(relpath)

@@ -6,21 +6,31 @@ import { compile } from "../src/app/cli.js"
 import { FileTree } from "../src/utils/filetree.js"
 
 // -------------------------------------------------------
+/**
+ * @param {string} fpath - file path
+ * @param {string} to - new extension like `.html`
+ * @returns {string} - the file path with extension subtitued
+ */
+function changeExt(fpath, to) {
+    const pi = path.parse(fpath)
+    return path.join(pi.dir, pi.name + to)
+}
+
+/**
+ *
+ * @param {string} relpath - relative path
+ * @returns {string} new path
+ */
+const newpath = (relpath) => {
+    const OUT_DIR = "./temp/"
+    const temp = relpath.endsWith(".md") ? changeExt(relpath, ".html") : relpath
+    return path.join(OUT_DIR, temp)
+}
+// -------------------------------------------------------
 
 // const wdir = "/home/ditroid/Documents/network-security/"
 const wdir = path.join(appRoot.path, "tests", "cases")
-const outdir = "./temp/"
-
 const filetree = new FileTree(wdir)
-const newpath = (relpath) => {
-    const pi = path.parse(relpath)
-    const newpath =
-        pi.ext == ".md"
-            ? path.join(outdir, pi.dir, pi.name + ".html")
-            : path.join(outdir, relpath)
-    return newpath
-}
-// TODO add file dispatcher
 const router = (x) => {
     let f1 = filetree.findFiles("/" + x)
     let f2 = filetree.findFiles("/" + x + ".md")
@@ -39,5 +49,9 @@ const router = (x) => {
         throw "file not found: " + x
     }
 }
+// -------------------------------------------------------
+
+console.log(appRoot.path)
+console.log(filetree.allFiles())
 
 compile(wdir, filetree, newpath, router)
