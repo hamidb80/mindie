@@ -129,9 +129,11 @@ function mineWikiLinks(mdast, urlify) {
                 mdastTextNode(node.value.slice(0, match.index)),
                 match[0].charAt(0) == "!"
                     ? mdastAssetNode(urlify(match[1]))
-                    : mdastLinkNode(urlify(match[1]), [
-                          mdastTextNode(match[1]),
-                      ]),
+                    : mdastLinkNode(
+                          urlify(match[1]),
+                          [mdastTextNode(match[1])],
+                          match[1]
+                      ),
                 mdastTextNode(node.value.slice(match.index + match[0].length)),
             ],
         },
@@ -218,7 +220,7 @@ function findNode(ast, cond) {
     }
 }
 
-export function parseGoT(parsedMd) {
+export function parseGoT(mdast) {
     // extract this structure
     // list:
     //   listItem
@@ -233,7 +235,7 @@ export function parseGoT(parsedMd) {
     //          paragraph
     //            link <-- dep 1
 
-    const mainList = findNode(parsedMd.ast, (n) => n.type == "list")
+    const mainList = findNode(mdast, (n) => n.type == "list")
     if (mainList) {
         return mainList.children.map((li) => {
             const p = findNode(li, (n) => n.type == "paragraph")
@@ -249,7 +251,7 @@ export function parseGoT(parsedMd) {
                 kind: k === "thought" ? "message" : "node",
                 class: k,
                 height: t ? +t.value : undefined,
-                content: l.url,
+                content: l.literal,
                 parents:
                     d?.children?.map(
                         (lr) =>

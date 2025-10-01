@@ -47,8 +47,8 @@ export function mdastHighlightNode(children) {
  * @param {Array} children
  * @returns {object}
  */
-export function mdastLinkNode(url, children) {
-    return { type: "link", url, children }
+export function mdastLinkNode(url, children, literal) {
+    return { type: "link", url, literal, children }
 }
 
 /**

@@ -26,12 +26,29 @@ export class FileTree {
         this.stree = new Suffixer(filePaths)
     }
 
+    /**
+     * 
+     * @param {string} suffix 
+     * @returns {string[]}
+     */
     findFiles(suffix) {
         try {
-            return this.stree?.endsWith(suffix)?.map(first)
+            return this.stree.endsWith(suffix)?.map(first) || []
         } catch (e) {
             return []
         }
+    }
+/**
+ * 
+ * @param {string[]} suffixes 
+ * @returns {string[]}
+ */
+    findFilesOr(suffixes) {
+        for (const suffix of suffixes) {
+            let fpaths = this.findFiles(suffix)
+            if (fpaths.length != 0) return fpaths
+        }
+        return []
     }
 
     allFiles() {

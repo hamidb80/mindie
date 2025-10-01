@@ -108,7 +108,7 @@ function toggleClass(el, cls, cond) {
     return toggleClassImpl(
         el,
         cls,
-        cond === undefined ? el.classList.contains(cls) : cond,
+        cond === undefined ? el.classList.contains(cls) : cond
     )
 }
 
@@ -123,6 +123,13 @@ function isElementDisplayed(element) {
 function detectBreakpoint(br) {
     return isElementDisplayed(q(`.breakpoints .d-${br}-block`))
 }
+
+up.macro("a", (el) => {
+    let link = el.getAttribute("href")
+    if (link.startsWith("/")) {
+        el.setAttribute("up-follow", "")
+    }
+})
 
 up.compiler(".latex", (el, data) => {
     katex.render(el.innerText, el, { displayMode: data.display == "true" })
@@ -167,7 +174,7 @@ up.compiler("[got]", (_, data) => {
                 e,
                 cursor >= 0 &&
                     data.events[cursor].id != e.getAttribute("node-id"),
-                "d-none",
+                "d-none"
             )
         })
     }
@@ -235,7 +242,7 @@ up.compiler("[got]", (_, data) => {
                 focusNode(el)
 
                 qa(".content").forEach((el) =>
-                    clsx(el, el.getAttribute("for") != id, "opacity-25"),
+                    clsx(el, el.getAttribute("for") != id, "opacity-25")
                 )
 
                 scrollToElement(q(".content-bar"), q(`[for="${id}"]`))

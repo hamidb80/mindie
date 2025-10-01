@@ -1,3 +1,5 @@
+import path from 'path'
+
 /**
  * @param {string} fpath - file path
  * @param {string} to - new extension like `.html`

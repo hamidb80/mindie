@@ -56,7 +56,7 @@
       @let(key = e.content)
       @let(c = e.class)
       @let(t = c || 'thoughts')
-      {{-- @let(article = db[key]) --}}
+      @let(article = db(key))
       @let(summ = dict(t))
       @let(icon = {
       problem: "bi bi-question-circle",
@@ -67,17 +67,17 @@
       thoughts: "bi bi-chat",
       }[t])
       @let(color = config.styles.color_map[t])
-      {{-- @let(has_link = !article.private) --}}
+      @let(has_link = !article.private)
       <div class="pb-3 content" content="{{key}}" for="{{e.id}}">
         <div class="card">
           <div class="card-header d-flex justify-content-between px-2">
             <div class="text-truncate">
-              {{-- @if(has_link)
+              @if(has_link)
               <a class="text-muted" up-follow href="{{router(key)}}">
                 <i class="bi bi-hash"></i>
                 {{key}}
               </a>
-              @end --}}
+              @end
             </div>
 
             <div class="d-flex align-items-center">
@@ -99,14 +99,8 @@
           </div>
 
           <div class="card-body" dir="auto">
-            {{-- {{mu_to_html(article.content, router)}} --}}
+            {{{article.html}}}
           </div>
-
-          {{-- <div class="card-footer d-flex justify-content-between py-1">
-            <small class="text-muted">
-              {{article.meta.title}}
-            </small>
-          </div> --}}
 
         </div>
       </div>

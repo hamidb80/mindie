@@ -31,36 +31,6 @@ function dict(key, locale = "en", args = {}) {
 
 const pkg = await readPackage()
 
-/*
-(defn load-deep (root)
-  "
-  find all markup/GoT files in the `dir` and load them.
-  "
-  (let [acc @{}
-        root-dir (path/dir root)]
-    
-    (each p (os/list-files-rec root-dir)
-      (let [pparts    (path/split p)
-            kind (cond 
-                  (string/has-suffix? markup-ext p) :note
-                  (string/has-suffix?    got-ext p) :got
-                  nil)]
-        (if kind 
-          (put acc 
-            (keyword (string/remove-prefix root-dir (pparts :dir)) (pparts :name)) 
-            @{:path    p
-              :kind    kind
-              :private (string/has-suffix? private-suffix (pparts :name))
-              :meta    @{} # attributes that are computed after initial preprocessing
-              :content (let [file-content (try (slurp p)            ([e] (error (string "error while reading from file: "                       p "\n >>> " e))))
-                             lisp-code    (try (parse file-content) ([e] (error (string "error while parseing lisp code from file: "            p "\n >>> " e))))
-                             result       (try (eval  lisp-code)    ([e] (error (string "error while evaluating parseing lisp code from file: " p "\n >>> " e))))]
-                          result)}))))
-    acc))
-*/
-
-// TODO convert load-deep to make `article` available in the got template
-
 const DEFAULT_GOT_CONFIG = {
     app: { title: "Title", root: "home" },
     styles: {
@@ -87,13 +57,15 @@ const DEFAULT_GOT_CONFIG = {
  * @summary iterate through files -> maybe compile -> write
  * @param {string} wdir - working directory
  * @param {FileTree} filetree
+ * @param {Object} database
  * @param {string -> string} pathDispatcher
- * @param {string -> string} router 
- * 
+ * @param {string -> string} router
+ *
  */
 export async function compile(
     wdir,
     filetree,
+    database,
     pathDispatcher,
     router,
     config = DEFAULT_GOT_CONFIG
@@ -105,18 +77,23 @@ export async function compile(
         const ppout = path.parse(outpath)
         const nt = noteType(relpath)
 
+        const db = (p) => {
+            let t = `${p}.md`
+            let fpaths = filetree.findFiles(t)
+            return database[fpaths[0]]
+        }
+
         await fs.promises.mkdir(ppout.dir, { recursive: true })
 
         if (nt == "other") {
             console.log(`[COPY] ${inpath} -> ${outpath}`)
             await fs.promises.copyFile(inpath, outpath)
         } else {
-            const content = fs.readFileSync(inpath, "utf-8")
-            const md = parseMarkdown(content, relpath, router)
+            const md = database[relpath]
 
             console.log(`[PROC] ${inpath} -> ${outpath}`)
             if (nt == "got") {
-                const events = parseGoT(md)
+                const events = parseGoT(md.ast)
 
                 let got = new GraphOfThought(events)
                 let svgObj = got.toSVG(config.styles)
@@ -127,6 +104,7 @@ export async function compile(
                     router,
                     dict,
                     config,
+                    db,
                     svg: htmlUtils.toHtml(svgObj),
                 })
                 fs.writeFileSync(outpath, html)
