@@ -126,7 +126,6 @@ export async function compile(
                 })
                 fs.writeFileSync(outpath, html)
             } else if (nt == "md") {
-                console.log(relpath)
                 const html = await fromTemplate("note", {
                     title: config.app.title,
                     content: database[relpath].html,

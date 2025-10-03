@@ -30,26 +30,20 @@ const pathDispatch = (relpath, outdir = "./temp/") => {
  * @returns
  */
 const router = (partial_fpath, root = "/") => {
-    if (partial_fpath) {
-        let fpaths = filetree.findFilesOr([
-            `/${partial_fpath}.md`,
-            `/${partial_fpath}`,
-        ])
+    let t = partial_fpath || "index"
+    let fpaths = filetree.findFilesOr([`/${t}.md`, `/${t}`])
 
-        if (fpaths.length == 1) {
-            return pathDispatch(fpaths[0], root)
-        } else {
-            console.error(fpaths)
-            throw `expect only (1) file to be resolved, but found (${fpaths.length}) for '${partial_fpath}'`
-        }
+    if (fpaths.length == 1) {
+        return pathDispatch(fpaths[0], root)
     } else {
-        return root
+        console.error(fpaths)
+        throw `expect only (1) file to be resolved, but found (${fpaths.length}) for '${partial_fpath}'`
     }
 }
 // -------------------------------------------------------
 
-console.log(appRoot.path)
-console.log(filetree.allFiles())
+// console.log(appRoot.path)
+// console.log(filetree.allFiles())
 
 const database = {}
 filetree.findFiles(".md").forEach((relpath) => {

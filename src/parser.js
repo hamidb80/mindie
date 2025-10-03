@@ -123,10 +123,11 @@ export function parseQuery(h) {
  * @returns the changed `mdast`
  */
 function advancedParsing(mdast, urlify) {
-    // XXX add them
+    // TODO add them
     // https://github.com/landakram/mdast-util-wiki-link/
     // https://github.com/syntax-tree/mdast-util-math
     // https://github.com/syntax-tree/mdast?tab=readme-ov-file#linkreference: frontmatter
+    // XXX or write entire parser from scratch with Tree Sitter
 
     const cases = [
         {
