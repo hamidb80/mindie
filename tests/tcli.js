@@ -42,8 +42,8 @@ const router = (partial_fpath, root = "/") => {
 }
 // -------------------------------------------------------
 
-// console.log(appRoot.path)
-// console.log(filetree.allFiles())
+console.log(appRoot.path)
+console.log(filetree.allFiles())
 
 const database = {}
 filetree.findFiles(".md").forEach((relpath) => {

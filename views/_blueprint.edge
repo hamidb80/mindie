@@ -7,14 +7,7 @@
 </head>
 
 <body>
-  <div class="breakpoints">
-    <div id="" class="d-none d-sm-block"></div>
-    <div id="" class="d-none d-md-block"></div>
-    <div id="" class="d-none d-lg-block"></div>
-    <div id="" class="d-none d-xl-block"></div>
-    <div id="" class="d-none d-xxl-block"></div>
-  </div>
-
+  @include('_breakpoint-detector')
   <main>
     <div class="container mt-4 mb-2 d-flex justify-content-center">
       @!component("_nav-path", {router, title, pathParts})

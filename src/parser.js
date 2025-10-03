@@ -131,18 +131,23 @@ function advancedParsing(mdast, urlify) {
 
     const cases = [
         {
-            pattern: /!?\[\[([^\n*:]*?)\]\]/,
-            transformer: (match, node) => [
-                mdastTextNode(node.value.slice(0, match.index)),
-                match[0].charAt(0) == "!"
-                    ? mdastAssetNode(urlify(match[1]))
-                    : mdastLinkNode(
-                          urlify(match[1]),
-                          [mdastTextNode(match[1])],
-                          match[1]
-                      ),
-                mdastTextNode(node.value.slice(match.index + match[0].length)),
-            ],
+            pattern: /!?\[\[([^\n*:]*?)(?:\s*\|(.+)\s*)?\]\]/,
+            transformer: (match, node) => {
+                console.log(match)
+                return [
+                    mdastTextNode(node.value.slice(0, match.index)),
+                    match[0].charAt(0) == "!"
+                        ? mdastAssetNode(urlify(match[1]))
+                        : mdastLinkNode(
+                              urlify(match[1]),
+                              [mdastTextNode(match[2] || match[1])],
+                              match[1]
+                          ),
+                    mdastTextNode(
+                        node.value.slice(match.index + match[0].length)
+                    ),
+                ]
+            },
         },
         {
             pattern: /==(.*?)==/,

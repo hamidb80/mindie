@@ -4,5 +4,5 @@ have you ever felt that you think at higher level kinda like a 3rd person shoote
 
 this is very strange feeling and it got more attention with rise of AI. 
 
-some one said:
-> in order to understand, you have to be consciousness, and AI is not...
+in the [[is consciousness an illusion 5, experts explain|a video]] the expert said
+> These AI bots do not understand what they're doing! **Understanding is a quality which needs consciousness**, and they don't have consciousness...
