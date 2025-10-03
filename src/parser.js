@@ -133,11 +133,10 @@ function advancedParsing(mdast, urlify) {
         {
             pattern: /!?\[\[([^\n*:]*?)(?:\s*\|(.+)\s*)?\]\]/,
             transformer: (match, node) => {
-                console.log(match)
                 return [
                     mdastTextNode(node.value.slice(0, match.index)),
                     match[0].charAt(0) == "!"
-                        ? mdastAssetNode(urlify(match[1]))
+                        ? mdastAssetNode(urlify(match[1]), match[2])
                         : mdastLinkNode(
                               urlify(match[1]),
                               [mdastTextNode(match[2] || match[1])],

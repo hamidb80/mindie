@@ -63,8 +63,7 @@ export function mdastLinkNode(url, children, literal) {
  * @param {string} url
  * @returns {object}
  */
-export function mdastAssetNode(urlWithOptions) {
-    const [url, options] = urlWithOptions.split("|")
+export function mdastAssetNode(url, options) {
     const info = path.parse(url)
 
     if (IMAGE_FILE_EXTS.includes(info.ext)) {
@@ -80,7 +79,7 @@ export function mdastAssetNode(urlWithOptions) {
         throw new Error("document files are not supported yet: " + url)
     } else {
         throw new Error(
-            "unknown file format for: '" + url + "' which is " + info.ext,
+            "unknown file format for: '" + url + "' which is " + info.ext
         )
     }
 }

@@ -1,9 +1,8 @@
-## list of content
+you know, I the world we live in, always makes me wonder.
 
 - [[consciousness]]
 - [[mystery of language symbols]]
 
 
-## list of questions
-
+think aloud protocol 
 - [[sample.got]]

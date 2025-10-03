@@ -123,6 +123,15 @@ function isElementDisplayed(element) {
 function detectBreakpoint(br) {
     return isElementDisplayed(q(`.breakpoints .d-${br}-block`))
 }
+function applySystemTheme() {
+    const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
+    document.documentElement.setAttribute(
+        "data-bs-theme",
+        isDarkMode ? "dark" : "light"
+    )
+}
+
+// ----------------------------------------
 
 up.macro("a", (el) => {
     let link = el.getAttribute("href")
@@ -307,3 +316,12 @@ up.compiler("[got]", (_, data) => {
 })
 
 up.compiler("[got-svg]", (parent) => {})
+
+// ----------------------------------------
+
+document.addEventListener("DOMContentLoaded", () => {
+    applySystemTheme()
+    window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .addEventListener("change", applySystemTheme)
+})
