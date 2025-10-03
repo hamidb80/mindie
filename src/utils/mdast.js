@@ -72,6 +72,7 @@ export function mdastAssetNode(url, options) {
             url,
             title: info.name,
             alt: info.base,
+            options,
         }
     } else if (VIDEO_FILE_EXTS.includes(info.ext)) {
         throw new Error("video files are not supported yet: " + url)

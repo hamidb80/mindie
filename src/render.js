@@ -140,7 +140,9 @@ export function mdast2hast(mdast) {
             return {
                 type: "element",
                 tagName: "figure",
-                properties: {},
+                properties: {
+                    class: "text-center",
+                },
                 children: [
                     {
                         type: "element",
@@ -149,6 +151,7 @@ export function mdast2hast(mdast) {
                             src: node.url,
                             alt: node.alt,
                             title: node.title,
+                            height: node.options,
                         },
                     },
                 ],
@@ -169,6 +172,9 @@ export function mdast2hast(mdast) {
         } else if (node.type === "tableCell") {
         } else if (node.type === "tableCell") {
         } else if (node.type === "html") {
+            throw new Error(
+                `WTF please do not write HTML into your markdown!!!`
+            )
         } else {
             throw new Error(`invalid mdast node type: '${node.type}'`)
         }

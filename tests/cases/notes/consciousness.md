@@ -1,4 +1,4 @@
-![[consciousness-image.jpg|500]]
+![[consciousness-image.jpg|400]]
 
 have you ever felt that you think at higher level kinda like a 3rd person shooter games?  that's it!!!
 
