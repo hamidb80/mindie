@@ -39,18 +39,18 @@ export function toTextRepr(node) {
 export function mdast2hast(mdast) {
     return hastUtils.toHast(mdast)
 
-    // ----------------------------------------
+    // TODO
 
     function impl(node) {
         if (node.type === "paragraph") {
-        } else if (node.type === "list") {
-        } else if (node.type === "listItem") {
         } else if (node.type === "text") {
-        } else if (node.type === "image") {
-        } else if (node.type === "html") {
-        } else if (node.type === "heading") {
         } else if (node.type === "emphasis") {
         } else if (node.type === "strong") {
+        } else if (node.type === "heading") {
+        } else if (node.type === "list") {
+        } else if (node.type === "listItem") {
+        } else if (node.type === "image") {
+        } else if (node.type === "html") {
         } else if (node.type === "delete") {
         } else if (node.type === "footnoteReference") {
         } else if (node.type === "footnoteDefinition") {
