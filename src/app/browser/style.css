@@ -54,15 +54,15 @@ pre {
 
 @media (prefers-color-scheme: light) {
     :root {
-        --got-node-focus-stroke-color: #212121;
-        --got-node-stroke-color: #424242;
-        --got-problem-node-color: #545454;
-        --got-goal-node-color: #545454;
+        --got-node-focus-stroke-color: #000000;
+        --got-node-stroke-color: #000000;
+        --got-problem-node-color: #212121;
+        --got-goal-node-color: #424242;
         --got-recall-node-color: #864af9;
         --got-calculate-node-color: #e85c0d;
         --got-reason-node-color: #5cb338;
         --got-thought-node-color: #ffef00;
-        --thought-node-opacity: 0.5;
+        --thought-node-opacity: 0.7;
     }
 }
 @media (prefers-color-scheme: dark) {
