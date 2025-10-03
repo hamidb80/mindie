@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
   <title>{{title}}</title>
@@ -15,11 +15,11 @@
     <div id="" class="d-none d-xxl-block"></div>
   </div>
 
-  <div class="container mt-4 mb-2 d-flex justify-content-center">
-    @!component("_nav-path", {router, title, pathParts})
-  </div>
-
   <main>
+    <div class="container mt-4 mb-2 d-flex justify-content-center">
+      @!component("_nav-path", {router, title, pathParts})
+    </div>
+
     {{{ await $slots.main() }}}
   </main>
 </body>

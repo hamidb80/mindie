@@ -1,2 +1,9 @@
-hey, this is 
-hello have you seen [[consciousness]] ?
+## list of content
+
+- [[consciousness]]
+- [[mystery of language symbols]]
+
+
+## list of questions
+
+- [[sample.got]]

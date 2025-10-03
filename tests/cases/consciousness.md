@@ -1,1 +1,0 @@
-![[consciousness-image.jpg]]
