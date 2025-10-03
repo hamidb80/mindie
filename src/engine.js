@@ -22,7 +22,7 @@ export function textMatchQuery(paragraph, query) {
         }
     } else {
         throw new Error(
-            "cannot match agains paragraph with query of header: " + q.header,
+            "cannot match agains paragraph with query of header: " + q.header
         )
     }
 }
@@ -31,7 +31,7 @@ export function textMatchQuery(paragraph, query) {
  * to query a single note and find the corresponding elements
  * @param {Object} ast - AST of the note
  * @param {Object} query - parsed query
- * @returns {object | undefined)
+ * @returns {object | undefined}
  */
 export function queryNote(ast, query) {
     let result
@@ -126,7 +126,9 @@ export async function digestWorkspace(ftree, wdir) {
             let match = queryNote(md.ast, q)
             if (!match) {
                 throw new Error(
-                    `cannot match query ${JSON.stringify(q)} with any of the nodes in ${md.path}`,
+                    `cannot match query ${JSON.stringify(
+                        q
+                    )} with any of the nodes in ${md.path}`
                 )
             }
         })
