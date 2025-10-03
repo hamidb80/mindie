@@ -47,6 +47,6 @@ pre {
     padding-bottom: 6px;
     padding-top: 4px;
     z-index: 4;
-    background-color: #fff;
+    backdrop-filter: blur(10px);
   }
 }
