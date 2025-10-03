@@ -37,20 +37,129 @@ export function toTextRepr(node) {
  * @returns {object} HTML AST
  */
 export function mdast2hast(mdast) {
-    return hastUtils.toHast(mdast)
-
-    // TODO
-
     function impl(node) {
-        if (node.type === "paragraph") {
+        if (node.type === "text") {
+            return {
+                type: "text",
+                value: node.value,
+            }
+        } else if (node.type === "root") {
+            return {
+                type: "root",
+                children: node.children.map(impl),
+            }
+        } else if (node.type === "paragraph") {
+            return {
+                type: "element",
+                tagName: "p",
+                properties: {},
+                children: node.children.map(impl),
+            }
         } else if (node.type === "text") {
+            return {
+                type: "element",
+                tagName: "p",
+                properties: {},
+                children: node.children.map(impl),
+            }
         } else if (node.type === "emphasis") {
+            return {
+                type: "element",
+                tagName: "i",
+                properties: {},
+                children: node.children.map(impl),
+            }
+        } else if (node.type === "inlineCode") {
+            return {
+                type: "element",
+                tagName: "code",
+                properties: {},
+                children: [
+                    {
+                        type: "text",
+                        value: node.value,
+                    },
+                ],
+            }
+        } else if (node.type === "highlight") {
+            return {
+                type: "element",
+                tagName: "mark",
+                properties: {},
+                children: node.children.map(impl),
+            }
         } else if (node.type === "strong") {
+            return {
+                type: "element",
+                tagName: "b",
+                properties: {},
+                children: node.children.map(impl),
+            }
+        } else if (node.type === "link") {
+            return {
+                type: "element",
+                tagName: "a",
+                properties: { href: node.url },
+                children: node.children.map(impl),
+            }
         } else if (node.type === "heading") {
+            return {
+                type: "element",
+                tagName: `h${node.depth}`,
+                properties: {},
+                children: node.children.map(impl),
+            }
         } else if (node.type === "list") {
+            // TODO detect numbered
+            return {
+                type: "element",
+                tagName: node.ordered ? "ol" : "ul",
+                properties: {},
+                children: node.children.map(impl),
+            }
         } else if (node.type === "listItem") {
+            return {
+                type: "element",
+                tagName: "li",
+                properties: {},
+                children: node.children.map(impl),
+            }
+        } else if (node.type === "tag") {
+            return {
+                type: "element",
+                tagName: "span",
+                properties: { class: "tag" },
+                children: [
+                    {
+                        type: "text",
+                        value: node.value,
+                    },
+                ],
+            }
         } else if (node.type === "image") {
-        } else if (node.type === "html") {
+            return {
+                type: "element",
+                tagName: "figure",
+                properties: {},
+                children: [
+                    {
+                        type: "element",
+                        tagName: "img",
+                        properties: {
+                            src: node.url,
+                            alt: node.alt,
+                            title: node.title,
+                        },
+                    },
+                ],
+            }
+        } else if (node.type === "blockquote") {
+            return {
+                type: "element",
+                tagName: "blockquote",
+                properties: {},
+                children: node.children.map(impl),
+            }
         } else if (node.type === "delete") {
         } else if (node.type === "footnoteReference") {
         } else if (node.type === "footnoteDefinition") {
@@ -59,12 +168,14 @@ export function mdast2hast(mdast) {
         } else if (node.type === "tableRow") {
         } else if (node.type === "tableCell") {
         } else if (node.type === "tableCell") {
+        } else if (node.type === "html") {
         } else {
             throw new Error(`invalid mdast node type: '${node.type}'`)
         }
     }
 
-    return hast2html(hast)
+    // return hastUtils.toHast(mdast)
+    return impl(mdast)
 }
 
 /**

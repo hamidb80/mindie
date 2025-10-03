@@ -1,7 +1,7 @@
 you know, I the world we live in, always makes me wonder.
 
 - [[consciousness]]
-- [[mystery of language symbols]]
+- [[mystery of languages and symbols]]
 
 
 think aloud protocol 
