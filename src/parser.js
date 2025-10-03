@@ -5,6 +5,7 @@ import {
     mdastAssetNode,
     mdastHighlightNode,
     mdastInlineLatex,
+    mdastBlockLatex,
     mdastLinkNode,
     mdastTagNode,
     mdastTextNode,
@@ -121,7 +122,12 @@ export function parseQuery(h) {
  * @param {Function} urlfy - a function to map file_name -> url
  * @returns the changed `mdast`
  */
-function mineWikiLinks(mdast, urlify) {
+function advancedParsing(mdast, urlify) {
+    // XXX add them
+    // https://github.com/landakram/mdast-util-wiki-link/
+    // https://github.com/syntax-tree/mdast-util-math
+    // https://github.com/syntax-tree/mdast?tab=readme-ov-file#linkreference: frontmatter
+
     const cases = [
         {
             pattern: /!?\[\[([^\n*:]*?)\]\]/,
@@ -142,9 +148,14 @@ function mineWikiLinks(mdast, urlify) {
             transformer: (m) => [mdastHighlightNode([mdastTextNode(m[1])])],
         },
         {
+            pattern: /\$\$\n(.+?)\n\$\$/m,
+            transformer: (m) => [mdastBlockLatex(m[1])],
+        },
+        {
             pattern: /\$(.+?)\$/,
             transformer: (m) => [mdastInlineLatex(m[1])],
         },
+
         {
             pattern: /#(\S+)/,
             transformer: (m) => [mdastTagNode(m[1])],
@@ -189,7 +200,7 @@ export function parseMarkdownRaw(txt) {
  */
 export function parseMarkdown(txt, path, urlify = (i) => i) {
     function parseFinal(str) {
-        return mineWikiLinks(parseMarkdownRaw(str), urlify)
+        return advancedParsing(parseMarkdownRaw(str), urlify)
     }
     if (txt.startsWith("---")) {
         const m = txt.match(/\n---\n/m)

@@ -22,6 +22,14 @@ export function mdastTextNode(s) {
  * @param {string} s
  * @returns {object}
  */
+export function mdastBlockLatex(value) {
+    return { type: "BlockLatex", value }
+}
+
+/**
+ * @param {string} s
+ * @returns {object}
+ */
 export function mdastInlineLatex(value) {
     return { type: "inlineLatex", value }
 }

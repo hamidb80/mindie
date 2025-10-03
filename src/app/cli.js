@@ -9,7 +9,7 @@ import * as htmlUtils from "hast-util-to-html"
 
 import { FileTree } from "../utils/filetree.js"
 import { noteType, parseGoT, parseMarkdown } from "../parser.js"
-import { fromTemplate, md2HtmlRaw } from "../render.js"
+import { fromTemplate, hast2html } from "../render.js"
 import { GraphOfThought } from "../got.js"
 // import { digestWorkspace } from "../engine.js"
 
@@ -122,7 +122,7 @@ export async function compile(
                     dict,
                     config,
                     db,
-                    svg: htmlUtils.toHtml(svgObj),
+                    svg: hast2html(svgObj),
                 })
                 fs.writeFileSync(outpath, html)
             } else if (nt == "md") {

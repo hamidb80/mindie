@@ -6,7 +6,7 @@ import appRoot from "app-root-path"
 import { compile } from "../src/app/cli.js"
 import { FileTree } from "../src/utils/filetree.js"
 import { changeExt } from "../src/utils/path.js"
-import { md2HtmlRaw } from "../src/render.js"
+import { mdast2hast, hast2html } from "../src/render.js"
 import { parseMarkdown } from "../src/parser.js"
 
 // -------------------------------------------------------
@@ -63,7 +63,7 @@ filetree.findFiles(".md").forEach((relpath) => {
     // const queries = highlights.map(parseQuery)
     // const nodes = queries.map((q) => queryNote(md.ast, q))
     // const htmls = nodes.map(md2HtmlRaw)
-    const html = md2HtmlRaw(md.ast)
+    const html = hast2html(mdast2hast(md.ast))
     database[relpath] = {
         title: md.frontMatter?.title ?? parts.name,
         url: router(relpath.substring(2)),

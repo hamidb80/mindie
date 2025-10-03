@@ -32,14 +32,48 @@ export function toTextRepr(node) {
 }
 
 /**
- * @summary convert markdown file to HTML
- * @param {object} mdast
- * @returns {string} HTML string
+ * @summary convert AST of markdown to AST of HTML (custom made)
+ * @param {object} MD AST
+ * @returns {object} HTML AST
  */
-export function md2HtmlRaw(mdast) {
-    const hast = hastUtils.toHast(mdast)
-    const html = htmlUtils.toHtml(hast)
-    return html
+export function mdast2hast(mdast) {
+    return hastUtils.toHast(mdast)
+
+    // ----------------------------------------
+
+    function impl(node) {
+        if (node.type === "paragraph") {
+        } else if (node.type === "list") {
+        } else if (node.type === "listItem") {
+        } else if (node.type === "text") {
+        } else if (node.type === "image") {
+        } else if (node.type === "html") {
+        } else if (node.type === "heading") {
+        } else if (node.type === "emphasis") {
+        } else if (node.type === "strong") {
+        } else if (node.type === "delete") {
+        } else if (node.type === "footnoteReference") {
+        } else if (node.type === "footnoteDefinition") {
+        } else if (node.type === "table") {
+        } else if (node.type === "tableCell") {
+        } else if (node.type === "tableRow") {
+        } else if (node.type === "tableCell") {
+        } else if (node.type === "tableCell") {
+        } else {
+            throw new Error(`invalid mdast node type: '${node.type}'`)
+        }
+    }
+
+    return hast2html(hast)
+}
+
+/**
+ * converts AST of HTML to the string representation of it
+ * @param {object} hast
+ * @returns {string}
+ */
+export function hast2html(hast) {
+    return htmlUtils.toHtml(hast)
 }
 
 // ----------------------------------------------
