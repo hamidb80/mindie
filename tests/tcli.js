@@ -68,4 +68,26 @@ filetree.findFiles(".md").forEach((relpath) => {
     }
 })
 
-compile(wdir, filetree, database, pathDispatch, router)
+const config = {
+    app: { title: "Title", root: "home" },
+    styles: {
+        radius: 16,
+        space: { x: 120, y: 80 },
+        pad: { x: 40, y: 40, node: 6 },
+        stroke: {
+            width: 4,
+            color: "var(--got-node-stroke-color)",
+        },
+        color_map: {
+            problem: "var(--got-problem-node-color)",
+            quite: "transparent",
+            goal: "var(--got-goal-node-color)",
+            recall: "var(--got-recall-node-color)",
+            calculate: "var(--got-calculate-node-color)",
+            reason: "var(--got-reason-node-color)",
+            thought: "var(--got-thought-node-color)",
+        },
+    },
+}
+
+compile(wdir, filetree, database, pathDispatch, router, config)

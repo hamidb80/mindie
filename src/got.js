@@ -282,7 +282,7 @@ export class GraphOfThought {
                             cx: locs[p][0],
                             cy: locs[p][1],
                             r: config.radius + config.stroke.width * 2,
-                            opacity: 0.5,
+                            opacity: "var(--thought-node-opacity)",
                             fill: config.color_map.thought,
                             role: "button",
                             type: "message",
