@@ -29,17 +29,21 @@ const pathDispatch = (relpath, outdir = "./temp/") => {
  * @param {string} sub
  * @returns
  */
-const router = (partial_fpath, sub = "/") => {
-    let fpaths = filetree.findFilesOr([
-        `/${partial_fpath}.md`,
-        `/${partial_fpath}`,
-    ])
+const router = (partial_fpath, root = "/") => {
+    if (partial_fpath) {
+        let fpaths = filetree.findFilesOr([
+            `/${partial_fpath}.md`,
+            `/${partial_fpath}`,
+        ])
 
-    if (fpaths.length == 1) {
-        return pathDispatch(fpaths[0], sub)
+        if (fpaths.length == 1) {
+            return pathDispatch(fpaths[0], root)
+        } else {
+            console.error(fpaths)
+            throw `expect only (1) file to be resolved, but found (${fpaths.length}) for '${partial_fpath}'`
+        }
     } else {
-        console.error(fpaths)
-        throw `expect only (1) file to be resolved, but found (${fpaths.length}) for '${partial_fpath}'`
+        return root
     }
 }
 // -------------------------------------------------------
