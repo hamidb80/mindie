@@ -1,6 +1,6 @@
 @component("_blueprint", {router, pathParts})
 <div class="container mt-4 mb-2 d-flex justify-content-center">
-  @!component("_nav-path", {pathParts})
+  @!component("_nav-path", {title, pathParts})
 </div>
 
 <div class="row gx-4 m-1 m-lg-3 mt-0" got data-events='{{{JSON.stringify(got.events)}}}'

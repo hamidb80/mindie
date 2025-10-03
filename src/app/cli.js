@@ -15,6 +15,24 @@ import { GraphOfThought } from "../got.js"
 
 // ----------------------------------------------
 
+const pkg = await readPackage()
+
+/**
+ *
+ * @param {string} p
+ * @returns {string[]}
+ */
+function pathParts(p) {
+    let skip
+
+    if (p.startsWith("/")) skip = 1
+    else if (p.startsWith("./")) skip = 2
+    else skip = 0
+
+    let t = p.substring(skip)
+    return t.split("/")
+}
+
 i18n.configure({
     locales: ["en"],
     directory: path.join(appRoot.path, "locales"),
@@ -28,8 +46,6 @@ function dict(key, locale = "en", args = {}) {
 }
 
 // -----------------------------------------------
-
-const pkg = await readPackage()
 
 const DEFAULT_GOT_CONFIG = {
     app: { title: "Title", root: "home" },
@@ -100,7 +116,8 @@ export async function compile(
 
                 const html = await fromTemplate("got", {
                     got,
-                    pinfo: ppin,
+                    title: config.app.title,
+                    pathParts: pathParts(relpath),
                     router,
                     dict,
                     config,
@@ -109,10 +126,11 @@ export async function compile(
                 })
                 fs.writeFileSync(outpath, html)
             } else if (nt == "md") {
-                const content = md2HtmlRaw(md.ast)
+                console.log(relpath)
                 const html = await fromTemplate("note", {
-                    content,
-                    pinfo: ppin,
+                    title: config.app.title,
+                    content: database[relpath].html,
+                    pathParts: pathParts(relpath),
                     router,
                     dict,
                 })
