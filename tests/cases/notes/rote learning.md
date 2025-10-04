@@ -1,0 +1,1 @@
+learning based on repeating, not understanding

@@ -163,6 +163,12 @@ export function mdast2hast(mdast) {
                 properties: {},
                 children: node.children.map(impl),
             }
+        } else if (node.type === "thematicBreak") {
+            return {
+                type: "element",
+                tagName: "hr",
+                properties: {},
+            }
         } else if (node.type === "delete") {
         } else if (node.type === "footnoteReference") {
         } else if (node.type === "footnoteDefinition") {
