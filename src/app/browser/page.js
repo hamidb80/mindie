@@ -1,45 +1,40 @@
-function getAttrs(el, attrNames) {
-    return attrNames.map((n) => el.getAttribute(n))
+// General Utils ----------------------------------------
+
+function clamp(n, max, min) {
+    return Math.min(max, Math.max(n, min))
 }
 
-function setAttrs(el, attrNames, values) {
-    return attrNames.map((n, i) => el.setAttribute(n, values[i]))
+function parseShallowJSON(json) {
+    for (const key in json) json[key] = JSON.parse(json[key])
+    return json
 }
 
-function setStyles(el, stylesObj) {
-    for (const key in stylesObj) {
-        el.style[key] = stylesObj[key]
-    }
+// Browser Utils ----------------------------------------
+
+function getQueryParam(key, dflt) {
+    const l = new URLSearchParams(window.location.search)
+    return l.get(key) || dflt
 }
 
-function nodeClass(id, dot = true) {
-    return (dot ? "." : "") + "node-" + id
+function setQueryParam(key, val) {
+    let u = new URLSearchParams(window.location.search)
+    u.set(key, val)
+    up.history.replace(window.location.pathname + "?" + u.toString(), {})
 }
 
-function qa(sel) {
-    return [...document.querySelectorAll(sel)]
-}
+// DOM Utils ----------------------------------------
 
 function q(sel, parent = document) {
     return parent.querySelector(sel)
 }
 
+function qa(sel, parent = document) {
+    return [...parent.querySelectorAll(sel)]
+}
+
 function clsx(el, cond, ...cls) {
     if (cond) el.classList.add(...cls)
     else el.classList.remove(...cls)
-}
-
-function clearDisplay(el) {
-    el.classList.add("d-none")
-}
-
-function hide(el) {
-    el.classList.add("invisible")
-}
-
-function show(el) {
-    el.classList.remove("invisible")
-    el.classList.remove("d-none")
 }
 
 function scrollToElement(wrapper, target, behavior = "smooth") {
@@ -67,53 +62,6 @@ function scrollToElement(wrapper, target, behavior = "smooth") {
     }
 }
 
-function highlightNode(el) {
-    el.setAttribute("stroke", "var(--got-node-focus-stroke-color)")
-    el.setAttribute("stroke-width", "4")
-}
-function blurNode(el) {
-    el.removeAttribute("stroke")
-    el.removeAttribute("stroke-width")
-}
-
-function getParam(key, dflt) {
-    const l = new URLSearchParams(window.location.search)
-    return l.get(key) || dflt
-}
-function setParam(key, val) {
-    let u = new URLSearchParams(window.location.search)
-    u.set(key, val)
-    up.history.replace(window.location.pathname + "?" + u.toString(), {})
-}
-
-function clamp(n, max, min) {
-    return Math.min(max, Math.max(n, min))
-}
-
-function parseShallowJSON(json) {
-    for (const key in json) json[key] = JSON.parse(json[key])
-    return json
-}
-
-// ----------------------------------------
-
-function toggleClassImpl(el, cls, state) {
-    if (state) el.classList.add(cls)
-    else el.classList.remove(cls)
-
-    return !state
-}
-
-function toggleClass(el, cls, cond) {
-    return toggleClassImpl(
-        el,
-        cls,
-        cond === undefined ? el.classList.contains(cls) : cond
-    )
-}
-
-// ----------------------------------------
-
 function isElementDisplayed(element) {
     return (
         window.getComputedStyle(element).getPropertyValue("display") !== "none"
@@ -123,15 +71,35 @@ function isElementDisplayed(element) {
 function detectBreakpoint(br) {
     return isElementDisplayed(q(`.breakpoints .d-${br}-block`))
 }
-function applySystemTheme() {
-    const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
+
+function isBrowserDarkThemed() {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+}
+
+// Domain Specific ----------------------------------------
+
+function setBootstrapTheme(dark) {
     document.documentElement.setAttribute(
         "data-bs-theme",
-        isDarkMode ? "dark" : "light"
+        dark ? "dark" : "light"
     )
 }
 
-// ----------------------------------------
+function nodeClass(id, dot = true) {
+    return (dot ? "." : "") + "node-" + id
+}
+
+function highlightNode(el) {
+    el.setAttribute("stroke", "var(--got-node-focus-stroke-color)")
+    el.setAttribute("stroke-width", "4")
+}
+
+function blurNode(el) {
+    el.removeAttribute("stroke")
+    el.removeAttribute("stroke-width")
+}
+
+// Unpoly ----------------------------------------
 
 up.macro("a", (el) => {
     let link = el.getAttribute("href")
@@ -226,7 +194,7 @@ up.compiler("[got]", (_, data) => {
 
     function setCursor(c) {
         c = clamp(parseInt(c), events.length - 1, -1)
-        setParam(cursorName, c)
+        setQueryParam(cursorName, c)
         return (cursor = c)
     }
 
@@ -300,7 +268,7 @@ up.compiler("[got]", (_, data) => {
         unversalStep(cursor)
     }
     function init() {
-        setCursor(parseInt(getParam(cursorName, 0)))
+        setCursor(parseInt(getQueryParam(cursorName, 0)))
         prepare()
         run()
     }
@@ -317,11 +285,12 @@ up.compiler("[got]", (_, data) => {
 
 up.compiler("[got-svg]", (parent) => {})
 
-// ----------------------------------------
+// Init ----------------------------------------
 
 document.addEventListener("DOMContentLoaded", () => {
-    applySystemTheme()
+    const themeApplier = setBootstrapTheme(isBrowserDarkThemed())
+    themeApplier()
     window
         .matchMedia("(prefers-color-scheme: dark)")
-        .addEventListener("change", applySystemTheme)
+        .addEventListener("change", themeApplier)
 })

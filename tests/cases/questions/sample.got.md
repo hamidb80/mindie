@@ -9,4 +9,3 @@
 	- `wtf-1`
 6. ==goal== `wtf-3` #1 [[consciousness]]
 	- `wtf-2`
-
