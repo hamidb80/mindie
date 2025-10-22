@@ -158,3 +158,7 @@ export async function compile(
         )
     }
 }
+
+// TODO add hit map:
+// for notes: direct reference count and reference-backs
+// for connections: show how much a note A or a note referencing note A is connected to note B or a note referencing nore B
