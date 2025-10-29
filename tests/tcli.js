@@ -14,22 +14,34 @@ import { parseMarkdown } from "../src/parser.js"
 // const wdir = "/home/ditroid/Documents/network-security/"
 const wdir = path.join(appRoot.path, "play")
 const filetree = new FileTree(wdir)
+const ROOT_PATH = "/bp-404/"
+const OUT_DIR = "./temp/bp-404/"
 
 /**
  *
  * @param {string} relpath - relative path
  * @returns {string} new path
  */
-const pathDispatch = (relpath, outdir = "./temp/") => {
+const pathDispatch = (relpath, outdir = OUT_DIR) => {
     let fpath = relpath.endsWith(".md") ? changeExt(relpath, ".html") : relpath
     let result = outdir ? path.join(outdir, fpath) : fpath
     return result
 }
+
+/**
+ *
+ * @param {string} relpath - relative path
+ * @returns {string} new path
+ */
+const rawRouter = (relpath, base = ROOT_PATH) => {
+    return pathDispatch(relpath, base)
+}
+
 /**
  * @param {string} sub
  * @returns
  */
-const router = (partial_fpath, root = "/") => {
+const router = (partial_fpath, root = ROOT_PATH) => {
     let t = partial_fpath || "index"
     let fpaths = filetree.findFilesOr([`/${t}.md`, `/${t}`])
 
@@ -53,7 +65,7 @@ filetree.findFiles(".md").forEach((relpath) => {
     const content = fs.readFileSync(real_fpath, "utf-8")
     const md = parseMarkdown(content, relpath, router)
     const parts = path.parse(real_fpath)
-    
+
     // const highlights = md.frontMatter?.highlights ?? []
     // const queries = highlights.map(parseQuery)
     // const nodes = queries.map((q) => queryNote(md.ast, q))
@@ -93,4 +105,4 @@ const config = {
     },
 }
 
-compile(wdir, filetree, database, pathDispatch, router, config)
+compile(wdir, filetree, database, pathDispatch, router, rawRouter, config)

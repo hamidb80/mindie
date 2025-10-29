@@ -84,6 +84,7 @@ export async function compile(
     database,
     pathDispatcher,
     router,
+    rawRouter,
     config = DEFAULT_GOT_CONFIG
 ) {
     const db = (p) => {
@@ -108,17 +109,18 @@ export async function compile(
             const md = database[relpath]
 
             console.log(`[PROC] ${inpath} -> ${outpath}`)
+            console.log("router:: ", router)
             if (nt == "got") {
                 const events = parseGoT(md.ast)
 
                 let got = new GraphOfThought(events)
                 let svgObj = got.toSVG(config.styles)
-
                 const html = await fromTemplate("got", {
                     got,
                     title: config.app.title,
                     pathParts: pathParts(relpath),
                     router,
+                    rawRouter,
                     dict,
                     config,
                     db,
@@ -131,6 +133,7 @@ export async function compile(
                     content: database[relpath].html,
                     pathParts: pathParts(relpath),
                     router,
+                    rawRouter,
                     dict,
                 })
                 fs.writeFileSync(outpath, html)
@@ -148,14 +151,10 @@ export async function compile(
     console.log(`[COPY] assets`, siteFiles)
 
     for (const sf of siteFiles) {
-        await fs.promises.cp(
-            path.join(cwd, sf),
-            path.join(appRoot.path, "temp", "public", sf),
-            {
-                recursive: true,
-                force: true,
-            }
-        )
+        await fs.promises.cp(path.join(cwd, sf), pathDispatcher(sf), {
+            recursive: true,
+            force: true,
+        })
     }
 }
 
