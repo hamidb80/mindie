@@ -52,7 +52,9 @@ export function mdast2hast(mdast) {
             return {
                 type: "element",
                 tagName: "p",
-                properties: {},
+                properties: {
+                    dir: "auto",
+                },
                 children: node.children.map(impl),
             }
         } else if (node.type === "text") {
@@ -73,11 +75,35 @@ export function mdast2hast(mdast) {
             return {
                 type: "element",
                 tagName: "code",
-                properties: {},
+                properties: {
+                    dir: "ltr",
+                },
                 children: [
                     {
                         type: "text",
                         value: node.value,
+                    },
+                ],
+            }
+        } else if (node.type === "code") {
+            return {
+                type: "element",
+                tagName: "pre",
+                properties: {
+                    dir: "ltr",
+                    class: "code-block",
+                },
+                children: [
+                    {
+                        type: "element",
+                        tagName: "code",
+                        properties: {},
+                        children: [
+                            {
+                                type: "text",
+                                value: node.value,
+                            },
+                        ],
                     },
                 ],
             }
@@ -106,7 +132,9 @@ export function mdast2hast(mdast) {
             return {
                 type: "element",
                 tagName: `h${node.depth}`,
-                properties: {},
+                properties: {
+                    dir: "auto",
+                },
                 children: node.children.map(impl),
             }
         } else if (node.type === "list") {
@@ -114,14 +142,18 @@ export function mdast2hast(mdast) {
             return {
                 type: "element",
                 tagName: node.ordered ? "ol" : "ul",
-                properties: {},
+                properties: {
+                    dir: "auto",
+                },
                 children: node.children.map(impl),
             }
         } else if (node.type === "listItem") {
             return {
                 type: "element",
                 tagName: "li",
-                properties: {},
+                properties: {
+                    dir: "auto",
+                },
                 children: node.children.map(impl),
             }
         } else if (node.type === "tag") {
@@ -151,7 +183,7 @@ export function mdast2hast(mdast) {
                             src: node.url,
                             alt: node.alt,
                             title: node.title,
-                            height: node.options,
+                            width: node.options?.trim(),
                         },
                     },
                 ],

@@ -12,7 +12,7 @@ import { parseMarkdown } from "../src/parser.js"
 // -------------------------------------------------------
 
 // const wdir = "/home/ditroid/Documents/network-security/"
-const wdir = path.join(appRoot.path, "tests", "cases")
+const wdir = path.join(appRoot.path, "play")
 const filetree = new FileTree(wdir)
 
 /**
@@ -53,11 +53,14 @@ filetree.findFiles(".md").forEach((relpath) => {
     const content = fs.readFileSync(real_fpath, "utf-8")
     const md = parseMarkdown(content, relpath, router)
     const parts = path.parse(real_fpath)
+    
     // const highlights = md.frontMatter?.highlights ?? []
     // const queries = highlights.map(parseQuery)
     // const nodes = queries.map((q) => queryNote(md.ast, q))
     // const htmls = nodes.map(md2HtmlRaw)
-    const html = hast2html(mdast2hast(md.ast))
+
+    const hast = mdast2hast(md.ast) // HTML AST
+    const html = hast2html(hast)
     database[relpath] = {
         title: md.frontMatter?.title ?? parts.name,
         url: router(relpath.substring(2)),

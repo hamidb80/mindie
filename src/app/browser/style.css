@@ -54,6 +54,8 @@ pre {
 
 @media (prefers-color-scheme: light) {
     :root {
+        --bg-code-area: rgba(0, 0, 0, 0.1);
+
         --got-node-focus-stroke-color: #000000;
         --got-node-stroke-color: #000000;
         --got-problem-node-color: #212121;
@@ -67,6 +69,8 @@ pre {
 }
 @media (prefers-color-scheme: dark) {
     :root {
+        --bg-code-area: rgba(255, 255, 255, 0.1);
+
         --got-node-focus-stroke-color: #fff;
         --got-node-stroke-color: #eaeaea;
         --got-problem-node-color: #f0f0f0;
@@ -77,4 +81,10 @@ pre {
         --got-thought-node-color: #e4d500;
         --thought-node-opacity: 0.9;
     }
+}
+
+pre.code-block {
+    padding: 8px;
+    border-radius: 5px;
+    background-color: var(--bg-code-area);
 }

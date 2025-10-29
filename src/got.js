@@ -54,7 +54,9 @@ class Grid {
     }
 }
 
-const dup = (val, times) => new Array(times).fill(val)
+function dup(val, times) {
+    return new Array(times).fill(val)
+}
 
 function chopInto(len, slices, max) {
     const m = max - slices + 1

@@ -86,18 +86,18 @@ export async function compile(
     router,
     config = DEFAULT_GOT_CONFIG
 ) {
+    const db = (p) => {
+        let t = `${p}.md`
+        let fpaths = filetree.findFiles(t)
+        return database[fpaths[0]]
+    }
+
     for (const relpath of filetree.allFiles()) {
         const inpath = path.join(wdir, relpath)
         const outpath = pathDispatcher(relpath)
         const ppin = path.parse(relpath)
         const ppout = path.parse(outpath)
         const nt = noteType(relpath)
-
-        const db = (p) => {
-            let t = `${p}.md`
-            let fpaths = filetree.findFiles(t)
-            return database[fpaths[0]]
-        }
 
         await fs.promises.mkdir(ppout.dir, { recursive: true })
 
