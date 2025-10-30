@@ -54,7 +54,7 @@
       @each(e in got.events)
       @let(key = e.content)
       @let(c = e.class)
-      @let(t = c || 'thoughts')
+      @let(t = c || 'reflect')
       @let(article = db(key))
       @let(summ = dict(t))
       @let(icon = {
@@ -63,7 +63,7 @@
       reason: "bi bi-lightbulb",
       recall: "bi bi-floppy",
       calculate: "bi bi-calculator",
-      thoughts: "bi bi-chat",
+      reflect: "bi bi-chat",
       }[t])
       @let(color = config.styles.color_map[t])
       <div class="pb-3 content" content="{{key}}" for="{{e.id}}">

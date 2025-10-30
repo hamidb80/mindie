@@ -63,8 +63,8 @@ pre {
         --got-recall-node-color: #864af9;
         --got-calculate-node-color: #e85c0d;
         --got-reason-node-color: #5cb338;
-        --got-thought-node-color: #ffef00;
-        --thought-node-opacity: 0.7;
+        --got-reflect-node-color: #ffef00;
+        --reflect-node-opacity: 0.7;
     }
 }
 @media (prefers-color-scheme: dark) {
@@ -78,8 +78,8 @@ pre {
         --got-recall-node-color: #864af9;
         --got-calculate-node-color: #e85c0d;
         --got-reason-node-color: #5cb338;
-        --got-thought-node-color: #e4d500;
-        --thought-node-opacity: 0.9;
+        --got-reflect-node-color: #e4d500;
+        --reflect-node-opacity: 0.9;
     }
 }
 
@@ -87,4 +87,9 @@ pre.code-block {
     padding: 8px;
     border-radius: 5px;
     background-color: var(--bg-code-area);
+    line-height: 1.1;
+}
+
+pre.code-block code {
+    font-size: 15px;
 }

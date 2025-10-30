@@ -25,7 +25,7 @@ const config = {
             recall: "#864AF9",
             calculate: "#E85C0D",
             reason: "#5CB338",
-            thoughts: "#ffef00",
+            reflect: "#ffef00",
         },
     },
 }

@@ -64,7 +64,7 @@ const DEFAULT_GOT_CONFIG = {
             recall: "#864AF9",
             calculate: "#E85C0D",
             reason: "#5CB338",
-            thought: "#ffef00",
+            reflect: "#ffef00",
         },
     },
 }
@@ -107,9 +107,7 @@ export async function compile(
             await fs.promises.copyFile(inpath, outpath)
         } else {
             const md = database[relpath]
-
             console.log(`[PROC] ${inpath} -> ${outpath}`)
-            console.log("router:: ", router)
             if (nt == "got") {
                 const events = parseGoT(md.ast)
 

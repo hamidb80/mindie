@@ -100,7 +100,7 @@ const config = {
             recall: "var(--got-recall-node-color)",
             calculate: "var(--got-calculate-node-color)",
             reason: "var(--got-reason-node-color)",
-            thought: "var(--got-thought-node-color)",
+            reflect: "var(--got-reflect-node-color)",
         },
     },
 }

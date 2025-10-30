@@ -288,7 +288,7 @@ up.compiler("[got-svg]", (parent) => {})
 // Init ----------------------------------------
 
 document.addEventListener("DOMContentLoaded", () => {
-    const themeApplier = setBootstrapTheme(isBrowserDarkThemed())
+    const themeApplier = () => setBootstrapTheme(isBrowserDarkThemed())
     themeApplier()
     window
         .matchMedia("(prefers-color-scheme: dark)")

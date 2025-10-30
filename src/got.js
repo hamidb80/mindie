@@ -266,7 +266,7 @@ export class GraphOfThought {
             })
         })
 
-        // === thoughts =========================
+        // === reflects =========================
         children.push(
             ...this.events
                 .filter((it) => it.kind == "message")
@@ -284,8 +284,8 @@ export class GraphOfThought {
                             cx: locs[p][0],
                             cy: locs[p][1],
                             r: config.radius + config.stroke.width * 2,
-                            opacity: "var(--thought-node-opacity)",
-                            fill: config.color_map.thought,
+                            opacity: "var(--reflect-node-opacity)",
+                            fill: config.color_map.reflect,
                             role: "button",
                             type: "message",
                             stroke: config.stroke.color,

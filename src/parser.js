@@ -264,7 +264,7 @@ export function parseGoT(mdast) {
             let k = h.children[0].value
             return {
                 id: c?.value,
-                kind: k === "thought" ? "message" : "node",
+                kind: k === "reflect" ? "message" : "node",
                 class: k,
                 height: t ? +t.value : undefined,
                 content: l.literal,
